@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data"
+
+  migrations:
+    build: .
+    depends_on:
+      db:
+        condition: service_started
+        required: true
+    environment:
+      DB_URL: ${MIGRATIONS_DB_URL}
+    entrypoint: ["alembic"]
+    command: ["-c","alembic.ini","current","-v"]
+    restart: "no"
+    volumes:
+      - .:/app
+
+
+  api:
+    build: .
+    depends_on:
+      db:
+        condition: service_started
+        required: true
+      migrations:
+        condition: service_started
+        required: true
+    environment:
+      APP_ENV: ${APP_ENV}
+      SECRET_KEY: ${SECRET_KEY}
+      DB_URL: ${APP_DB_URL}   # ASYNC URL; host 'db' inside Compose
+    ports:
+      - "${APP_PORT}:8000"
+    entrypoint: ["uvicorn"]
+    command: ["app.main:app","--host","0.0.0.0","--port","8000"]
+
+volumes:
+  pgdata:
