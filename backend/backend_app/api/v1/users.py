@@ -1,7 +1,9 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, FastAPI
 from sqlalchemy.orm import Session
 from backend_app.db import session
 from backend_app.db.models.user import User
+from backend_app.db.schema.userSchema import UserCreate, UserOut, UserSummary, UserUpdate
 
 router = APIRouter()
 
@@ -14,39 +16,56 @@ def get_db():
         db.close()
 
 # CREATE
-@router.post("/", response_model=dict)
-def create_user(username: str, email: str, password: str, db: Session = Depends(get_db)):
-    db_user = User(username=username, email=email, hashed_password=password)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return {"id": db_user.id, "username": db_user.username, "email": db_user.email}
+@router.post("/", response_model=UserOut)
+def create_user(user_in: UserCreate, db: Session = Depends(get_db)):
+    # Check for empty fields
+    for field, value in user_in.dict().items():
+        if isinstance(value, str) and not value.strip():
+            raise HTTPException(status_code=400, detail=f"{field} cannot be empty")
+
+    db_user = User(**user_in.dict())
+
+    try:
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+    except Exception as e:
+        db.rollback()
+        # Handle unique constraint or other DB errors
+        raise HTTPException(status_code=400, detail=f"Database error: {str(e)}")
+
+    return db_user
 
 # READ (all users)
-@router.get("/", response_model=list)
+@router.get("/", response_model=List[UserSummary])
 def list_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
-    return [{"id": u.id, "username": u.username, "email": u.email} for u in users]
+    if not users:
+        raise HTTPException(status_code=404, detail="No record available")
+    return users
 
 # READ (single user)
-@router.get("/{user_id}", response_model=dict)
+@router.get("/{user_id}", response_model=UserOut)
 def get_user(user_id: int, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    return {"id": user.id, "username": user.username, "email": user.email}
+    return user
 
 # UPDATE
-@router.put("/{user_id}", response_model=dict)
-def update_user(user_id: int, username: str, email: str, db: Session = Depends(get_db)):
+@router.put("/{user_id}", response_model=UserOut)
+def update_user(user_id: int, user_in: UserUpdate, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    user.username = username
-    user.email = email
+
+    # Apply updates only for provided fields
+    for field, value in user_in.dict(exclude_unset=True).items():
+        setattr(user, field, value)
+
     db.commit()
     db.refresh(user)
-    return {"id": user.id, "username": user.username, "email": user.email}
+    return user
 
 # DELETE
 @router.delete("/{user_id}", response_model=dict)
@@ -56,4 +75,4 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     db.delete(user)
     db.commit()
-    return {"message": f"User {user_id} deleted"}
+    return {"message": f"The user with id {user_id} was deleted successfully"}
