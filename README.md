@@ -26,3 +26,4 @@ This project is a FastAPI-based enterprise backend with PostgreSQL, Docker, and 
 - `app/services` → Business logic
 - `tests` → Unit tests
 - `alembic` → Database migrations
+-
