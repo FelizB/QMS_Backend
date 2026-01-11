@@ -4,7 +4,6 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="modified user creatiion CRUID operations&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;backend/backend_app/api/v1/users.py&#10;#&#9;backend/backend_app/db/models/user.py" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -46,23 +45,7 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "SHELLCHECK.PATH": "/Users/Feliz/Library/Application Support/JetBrains/IntelliJIdea2025.2/plugins/Shell Script/shellcheck",
-    "git-widget-placeholder": "Rebasing feat/clean-arch",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/Feliz/Desktop/Development/QMS",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2"
   }
-}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/fastapi-backend" />
@@ -99,23 +82,11 @@
       <option name="project" value="LOCAL" />
       <updated>1767734411139</updated>
     </task>
-    <task id="LOCAL-00003" summary="Added entrypoint.sh to automate all db tasks">
       <option name="closed" value="true" />
-      <created>1768097382031</created>
       <option name="number" value="00003" />
       <option name="presentableId" value="LOCAL-00003" />
       <option name="project" value="LOCAL" />
-      <updated>1768097382031</updated>
     </task>
-    <task id="LOCAL-00004" summary="modified user creatiion CRUID operations&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;backend/backend_app/api/v1/users.py&#10;#&#9;backend/backend_app/db/models/user.py">
-      <option name="closed" value="true" />
-      <created>1768097602112</created>
-      <option name="number" value="00004" />
-      <option name="presentableId" value="LOCAL-00004" />
-      <option name="project" value="LOCAL" />
-      <updated>1768097602112</updated>
-    </task>
-    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -132,14 +103,11 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Cleaned sensitive data" />
     <MESSAGE value="Added entrypoint.sh to automate all db tasks" />
-    <MESSAGE value="modified user creatiion CRUID operations&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;backend/backend_app/api/v1/users.py&#10;#&#9;backend/backend_app/db/models/user.py" />
-    <option name="LAST_COMMIT_MESSAGE" value="modified user creatiion CRUID operations&#10;&#10;# Conflicts:&#10;#&#9;.idea/workspace.xml&#10;#&#9;backend/backend_app/api/v1/users.py&#10;#&#9;backend/backend_app/db/models/user.py" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/backend/alembic2/env.py</url>
           <line>17</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
