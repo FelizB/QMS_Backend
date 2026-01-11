@@ -4,3 +4,9 @@ sqlalchemy
 psycopg2-binary
 alembic
 python-dotenv
+sqlalchemy[asyncio]
+asyncpg
+alembic
+pydantic
+pydantic-settings
+passlib
