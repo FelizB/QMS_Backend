@@ -22,5 +22,8 @@ class User(Base):
     RssToken   = Column(String(255), nullable=True)
     created_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now())
     updated_at = Column(DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
+    is_deleted = Column(Boolean, nullable=False, server_default=text("FALSE"))
+    deleted_at = Column(DateTime(timezone=True), nullable=True)
+
 
 

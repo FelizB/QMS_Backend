@@ -12,8 +12,9 @@ class CreateUserUseCase:
         # Optional normalization
         username = payload.Username.strip()
         email = payload.Email.strip().lower()
+        admin = payload.Admin or False
 
-        # Pre-check duplicates for nicer messages (DB unique will also protect)
+# Pre-check duplicates for nicer messages (DB unique will also protect)
         if await self.repo.get_by_username(username):
             raise ValueError("Username already exists")
         if await self.repo.get_by_email(email):
@@ -25,7 +26,7 @@ class CreateUserUseCase:
             Username=username,
             Email=email,
             hashed_password=hashed,
-            Admin=False,
+            Admin=admin,
             Active=True,
             Approved=False,
             Locked=False,

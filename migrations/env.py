@@ -1,5 +1,3 @@
-
-# migrations/env.py
 from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
@@ -24,9 +22,12 @@ config = context.config
 if config.config_file_name:
     fileConfig(config.config_file_name)
 
+
+
 # import your Base and models ONCE so autogenerate can see them
 from app.infrastructure.models.base import Base
 import app.infrastructure.models.user_model as user_model
+import app.infrastructure.models.project_model as project_model
 
 
 
