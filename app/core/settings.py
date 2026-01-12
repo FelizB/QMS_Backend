@@ -1,5 +1,3 @@
-
-# app/core/settings.py
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from dotenv import load_dotenv

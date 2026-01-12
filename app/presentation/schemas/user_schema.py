@@ -12,7 +12,7 @@ class UserBase(BaseModel):
     MiddleName: str
     LastName: str
     RssToken: Optional[str] = None
-
+    Admin:bool
 
 class UserCreate(UserBase):
     Password: str = Field(min_length=8)
@@ -47,6 +47,7 @@ class UserUpdate(BaseModel):
     Active: Optional[bool] = None
     Approved: Optional[bool] = None
     Locked: Optional[bool] = None
+    Admin:Optional[bool]=None
     FirstName: Optional[str] = None
     MiddleName: Optional[str] = None
     LastName: Optional[str] = None

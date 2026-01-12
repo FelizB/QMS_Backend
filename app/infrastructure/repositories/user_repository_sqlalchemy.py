@@ -54,10 +54,14 @@ class SQLAlchemyUserRepository(IUserRepository):
         return await self.get_by_id(id_)
 
     async def delete_user_and_return(self, id_: int):
-        obj = await self.session.get(UserModel, id_)
-        if not obj:
+        user = await self.session.get(UserModel, id_)
+        if not user:
             return None
-        await self.session.delete(obj)
+        user.is_deleted = True
+        user.deleted_at = datetime.utcnow()
+        user.active = False
+        user.Email = f"{user.Email}__deleted__{uuid4()}"
+        user.Username = f"{user.Username}__deleted__{uuid4()}"
+
         await self.session.commit()
-        # Optionally detach/clone if you don’t want a live instance
-        return obj
+        return user
