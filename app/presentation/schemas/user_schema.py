@@ -1,59 +1,56 @@
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from datetime import datetime
 from typing import Optional
+from pydantic import EmailStr, Field
+from .common import CamelModel
 
-class UserBase(BaseModel):
-    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
-    Username: str = Field(min_length=3, max_length=50)
-    Email: EmailStr = Field(max_length=100)
-    Department: str
-    Unit: str
-    FirstName: str
-    MiddleName: str
-    LastName: str
-    RssToken: Optional[str] = None
-    Admin:bool
+class UserBase(CamelModel):
+    username: str = Field(min_length=3, max_length=50)
+    email: EmailStr = Field(max_length=100)
+    department: str
+    unit: str
+    first_name: str
+    middle_name: Optional[str] = None
+    last_name: str
+    rss_token: Optional[str] = None
+    admin: bool = False  # default server-side too
 
 class UserCreate(UserBase):
-    Password: str = Field(min_length=8)
+    password: str = Field(min_length=8)
 
-class UserOut(BaseModel):
+class UserOut(CamelModel):
     id: int
-    Username: str
-    Email: EmailStr
+    username: str
+    email: EmailStr
     created_at: datetime
     updated_at: datetime
 
-class UserSummary(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+class UserSummary(CamelModel):
     id: int
-    Username: str
-    Email: EmailStr
+    username: str
+    email: EmailStr
     created_at: datetime
     updated_at: datetime
-    Department: str
-    Unit: str
-    Active: bool
-    Admin: bool
-    Approved: bool
-    Locked: bool
+    department: str
+    unit: str
+    active: bool
+    admin: bool
+    approved: bool
+    locked: bool
 
-class UserUpdate(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-    Username: Optional[str] = None
-    Email: Optional[EmailStr] = None
-    Department: Optional[str] = None
-    Unit: Optional[str] = None
-    Active: Optional[bool] = None
-    Approved: Optional[bool] = None
-    Locked: Optional[bool] = None
-    Admin:Optional[bool]=None
-    FirstName: Optional[str] = None
-    MiddleName: Optional[str] = None
-    LastName: Optional[str] = None
-    RssToken: Optional[str] = None
+class UserUpdate(CamelModel):
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    department: Optional[str] = None
+    unit: Optional[str] = None
+    active: Optional[bool] = None
+    approved: Optional[bool] = None
+    locked: Optional[bool] = None
+    admin: Optional[bool] = None
+    first_name: Optional[str] = None
+    middle_name: Optional[str] = None
+    last_name: Optional[str] = None
+    rss_token: Optional[str] = None
 
-
-class UserDeleteResponse(BaseModel):
+class UserDeleteResponse(CamelModel):
     message: str
     data: UserOut

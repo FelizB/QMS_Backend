@@ -27,6 +27,8 @@ if config.config_file_name:
 # import your Base and models ONCE so autogenerate can see them
 from app.infrastructure.models.base import Base
 import app.infrastructure.models.user_model as user_model
+import app.infrastructure.models.project_model as portfolio_model
+import app.infrastructure.models.project_model as program_model
 import app.infrastructure.models.project_model as project_model
 
 

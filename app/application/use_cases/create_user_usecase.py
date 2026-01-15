@@ -10,9 +10,9 @@ class CreateUserUseCase:
 
     async def execute(self, payload: UserCreate) -> UserSummary:
         # Optional normalization
-        username = payload.Username.strip()
-        email = payload.Email.strip().lower()
-        admin = payload.Admin or False
+        username = payload.username.strip()
+        email = payload.email.strip().lower()
+        admin = payload.admin or False
 
 # Pre-check duplicates for nicer messages (DB unique will also protect)
         if await self.repo.get_by_username(username):
@@ -20,22 +20,22 @@ class CreateUserUseCase:
         if await self.repo.get_by_email(email):
             raise ValueError("Email already exists")
 
-        hashed = get_password_hash(payload.Password)
+        hashed = get_password_hash(payload.password)
 
         model = UserModel(
-            Username=username,
-            Email=email,
+            username=username,
+            email=email,
             hashed_password=hashed,
-            Admin=admin,
-            Active=True,
-            Approved=False,
-            Locked=False,
-            Department=payload.Department,
-            Unit=payload.Unit,
-            FirstName=payload.FirstName,
-            MiddleName=payload.MiddleName,
-            LastName=payload.LastName,
-            RssToken=payload.RssToken,
+            admin=admin,
+            active=True,
+            approved=False,
+            locked=False,
+            department=payload.department,
+            unit=payload.unit,
+            first_name=payload.first_name,
+            middle_name=payload.middle_name,
+            last_name=payload.last_name,
+            rss_token=payload.rss_token,
         )
 
         try:

@@ -10,6 +10,7 @@ class ProjectBase(BaseModel):
     Description: Optional[str] = None
     Website: Optional[str] = None
     Active: Optional[bool] = True
+    Status: Optional[str] = "New"
     WorkingHours: Optional[int] = Field(default=None, ge=0)
     WorkingDays: Optional[int] = Field(default=None, ge=0, le=7)
     NonWorkingHours: Optional[int] = Field(default=None, ge=0)
@@ -45,6 +46,7 @@ class ProjectUpdate(BaseModel):
     Description: Optional[str] = None
     Website: Optional[str] = None
     Active: Optional[bool] = None
+    Status:Optional[str] = None
     WorkingHours: Optional[int] = Field(default=None, ge=0)
     WorkingDays: Optional[int] = Field(default=None, ge=0, le=7)
     NonWorkingHours: Optional[int] = Field(default=None, ge=0)
