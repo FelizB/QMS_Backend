@@ -1,22 +1,26 @@
 from __future__ import annotations
+
 from datetime import datetime, date
 from typing import Optional
+
+import sqlalchemy as sa
 from sqlalchemy import String, Integer, Boolean, DateTime, Date, Text
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
-import sqlalchemy as sa
+
 from .base import Base
+
 
 class Project(Base):
     __tablename__ = "projects"
 
     # Keys / Ids
-    project_id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    project_template_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, index=True)
-    project_group_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, index=True)
+    project_id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    project_template_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    project_group_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     # Basic info
-    name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     website: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
 

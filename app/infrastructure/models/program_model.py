@@ -1,13 +1,17 @@
 from __future__ import annotations
+
 import uuid
 from datetime import datetime
 from typing import Any, Dict, Optional
+
+import sqlalchemy as sa
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, Index, event
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
-import sqlalchemy as sa
+
 from .base import Base
+
 
 class Program(Base):
     __tablename__ = "programs"
@@ -27,10 +31,11 @@ class Program(Base):
     guid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), unique=True, default=uuid.uuid4, nullable=False)
     concurrency_guid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), default=uuid.uuid4, nullable=False)
 
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.true())
-    is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.false())
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.text("true"))
+    is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.text("false"))
 
-    custom_properties: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB, nullable=True, server_default=sa.text("'{}'::jsonb"))
+    custom_properties: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB, nullable=True,
+                                                                        server_default=sa.text("'{}'::jsonb"))
 
     last_updated_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -48,9 +53,13 @@ class Program(Base):
             "portfolio_id",
             unique=True,
             postgresql_where=sa.text("is_default IS TRUE"),
+            info={"alembic_autogenerate": False}
         ),
         # Optional: name unique within portfolio
-        Index("uq_program_name_per_portfolio", "portfolio_id", "name", unique=True),
+        Index("uq_program_name_per_portfolio",
+              "portfolio_id", "name",
+              unique=True,
+              info={"alembic_autogenerate": False}),
     )
 
 

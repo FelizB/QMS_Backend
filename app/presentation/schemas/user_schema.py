@@ -1,7 +1,10 @@
 from datetime import datetime
 from typing import Optional
+
 from pydantic import EmailStr, Field
+
 from .common import CamelModel
+
 
 class UserBase(CamelModel):
     username: str = Field(min_length=3, max_length=50)
@@ -14,8 +17,10 @@ class UserBase(CamelModel):
     rss_token: Optional[str] = None
     admin: bool = False  # default server-side too
 
+
 class UserCreate(UserBase):
     password: str = Field(min_length=8)
+
 
 class UserOut(CamelModel):
     id: int
@@ -23,6 +28,7 @@ class UserOut(CamelModel):
     email: EmailStr
     created_at: datetime
     updated_at: datetime
+
 
 class UserSummary(CamelModel):
     id: int
@@ -36,6 +42,8 @@ class UserSummary(CamelModel):
     admin: bool
     approved: bool
     locked: bool
+    is_deleted: bool
+
 
 class UserUpdate(CamelModel):
     username: Optional[str] = None
@@ -50,6 +58,7 @@ class UserUpdate(CamelModel):
     middle_name: Optional[str] = None
     last_name: Optional[str] = None
     rss_token: Optional[str] = None
+
 
 class UserDeleteResponse(CamelModel):
     message: str

@@ -4,19 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="updated merge">
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/_utils.py" afterDir="false" />
+    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="Added program and portfolio apis">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/application/use_cases/delete_user_usecase.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/delete_user_usecase.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/portfolio_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/portfolio_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/program_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/program_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/infrastructure/models/project_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/project_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/user_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/user_repository_sqlalchemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/project_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/project_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/user_routes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/migrations/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/env.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/51689c5856e1_dev_autogenerate.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/52f0b075d653_dev_autogenerate.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/dev_migrate_compose.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/dev_migrate_compose.sh" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -75,7 +78,7 @@
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/Users/Feliz/Desktop/Development/QMS",
-    "project.structure.last.edited": "Modules",
+    "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
     "rearrange.code.on.save": "true",
@@ -157,7 +160,15 @@
       <option name="project" value="LOCAL" />
       <updated>1768101857521</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Added program and portfolio apis">
+      <option name="closed" value="true" />
+      <created>1768508544777</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1768508544777</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -179,7 +190,8 @@
     <MESSAGE value="Added entrypoint.sh to automate all db tasks" />
     <MESSAGE value="modified user creatiion CRUID operations" />
     <MESSAGE value="updated merge" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated merge" />
+    <MESSAGE value="Added program and portfolio apis" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added program and portfolio apis" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -190,12 +202,13 @@
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/infrastructure/models/user_model.py</url>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/core/settings.py</url>
           <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/infrastructure/models/program_model.py</url>
+          <line>53</line>
+          <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

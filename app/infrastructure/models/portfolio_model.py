@@ -1,13 +1,17 @@
 from __future__ import annotations
+
 import uuid
 from datetime import datetime
 from typing import Any, Dict, Optional
-from sqlalchemy import Boolean, DateTime, Integer, String, Text, Index ,event
+
+import sqlalchemy as sa
+from sqlalchemy import Boolean, DateTime, Integer, String, Text, Index, event
 from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
-import sqlalchemy as sa
+
 from .base import Base
+
 
 class Portfolio(Base):
     __tablename__ = "portfolios"
@@ -24,10 +28,11 @@ class Portfolio(Base):
     guid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), unique=True, default=uuid.uuid4, nullable=False)
     concurrency_guid: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), default=uuid.uuid4, nullable=False)
 
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.true())
-    is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.false())
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.text("true"))
+    is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.text("false"))
 
-    custom_properties: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB, nullable=True, server_default=sa.text("'{}'::jsonb"))
+    custom_properties: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB, nullable=True,
+                                                                        server_default=sa.text("'{}'::jsonb"))
 
     last_updated_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -50,6 +55,7 @@ class Portfolio(Base):
             "is_default",
             unique=True,
             postgresql_where=sa.text("is_default IS TRUE"),
+            info={"alembic_autogenerate": False},
         ),
     )
 
