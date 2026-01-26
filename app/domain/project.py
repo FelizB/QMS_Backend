@@ -2,11 +2,13 @@ from dataclasses import dataclass
 from datetime import datetime, date
 from typing import Optional
 
+
 @dataclass
 class ProjectEntity:
     ProjectId: Optional[int]
     Name: str
     Description: Optional[str]
+    Environment: Optional[str]
     Active: bool
     CreationDate: datetime
     StartDate: Optional[date]

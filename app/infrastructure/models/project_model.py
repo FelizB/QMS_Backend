@@ -23,6 +23,7 @@ class Project(Base):
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     website: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
+    Environment: Mapped[Optional[str]] = mapped_column(String(2048), nullable=False)
 
     # Dates / status
     creation_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())

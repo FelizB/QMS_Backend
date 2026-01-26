@@ -30,6 +30,9 @@ class Portfolio(Base):
 
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.text("true"))
     is_default: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.text("false"))
+    # Soft delete fields
+    is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.false())
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
     custom_properties: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB, nullable=True,
                                                                         server_default=sa.text("'{}'::jsonb"))

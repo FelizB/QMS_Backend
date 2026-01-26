@@ -1,10 +1,14 @@
-from typing import Sequence, Optional
-from sqlalchemy import select, update
+from typing import Tuple, List, Optional
+
+from fastapi import HTTPException
+from sqlalchemy import update, select, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException, status
 
 from app.infrastructure.models.portfolio_model import Portfolio
+
+MAX_LIMIT = 200
+
 
 class PortfolioRepository:
     def __init__(self, session: AsyncSession):
@@ -23,12 +27,39 @@ class PortfolioRepository:
         res = await self.session.execute(select(Portfolio).where(Portfolio.id == portfolio_id))
         return res.scalar_one_or_none()
 
-    async def list(self, skip: int = 0, limit: int = 50, q: str | None = None) -> Sequence[Portfolio]:
-        stmt = select(Portfolio).offset(skip).limit(limit)
+    async def list(self, skip: int = 0, limit: int = 50, q: Optional[str] = None) -> Tuple[int, List[Portfolio]]:
+        # Guardrails
+        if limit <= 0:
+            limit = 50
+        if limit > MAX_LIMIT:
+            limit = MAX_LIMIT
+        if skip < 0:
+            skip = 0
+
+        base = (
+            select(Portfolio)
+            .where(Portfolio.is_deleted.is_(False)).limit(limit).offset(skip)
+        )
         if q:
-            stmt = stmt.where(Portfolio.name.ilike(f"%{q}%"))
-        res = await self.session.execute(stmt.order_by(Portfolio.id.desc()))
-        return res.scalars().all()
+            base = base.where(Portfolio.name.ilike(f"%{q}%"))
+
+        count_stmt = select(func.count()).select_from(base.subquery())
+        total_res = await self.session.execute(count_stmt)
+        total = int(total_res.scalar() or 0)
+
+        # Page window: ORDER → OFFSET → LIMIT
+        stmt = (
+            base
+            .order_by(Portfolio.id.desc())
+            .offset(skip)
+            .limit(limit)
+        )
+
+        res = await self.session.execute(stmt)
+        items = list(res.scalars().all())
+
+        # Return both total and items (better for clients)
+        return total, items
 
     async def update(self, portfolio_id: int, data: dict, concurrency_guid: str) -> Portfolio:
         # optimistic concurrency
@@ -36,6 +67,7 @@ class PortfolioRepository:
             update(Portfolio)
             .where(Portfolio.id == portfolio_id)
             .where(Portfolio.concurrency_guid == concurrency_guid)
+            .where(Portfolio.is_deleted.is_(False))
             .values(**data)
             .returning(Portfolio)
         )
@@ -50,6 +82,8 @@ class PortfolioRepository:
             update(Portfolio)
             .where(Portfolio.id == portfolio_id)
             .where(Portfolio.concurrency_guid == concurrency_guid)
+            .where(Portfolio.is_deleted.is_(False))
+            .values(is_deleted=True)
             .values(is_active=False)
             .returning(Portfolio)
         )
@@ -57,4 +91,5 @@ class PortfolioRepository:
         obj = res.scalar_one_or_none()
         if not obj:
             raise HTTPException(status_code=409, detail="Concurrency conflict or portfolio not found")
+
         return obj

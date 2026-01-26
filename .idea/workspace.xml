@@ -4,22 +4,37 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="Added program and portfolio apis">
+    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="Fix deleting issue which was not updating DB">
+      <change afterPath="$PROJECT_DIR$/app/application/use_cases/testcases/testcase_usecase.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/models/testcase_model.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/test_case_repository_sqlalchemy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/testcase_routes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/dependencies/current_user.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/testcase_schema.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/delete_user_usecase.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/delete_user_usecase.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/core/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/base.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/base.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/application/interfaces/portfolio_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/interfaces/portfolio_repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/application/use_cases/portfolio/delete_portfolio.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/portfolio/delete_portfolio.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/application/use_cases/portfolio/get_portfolio.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/portfolio/get_portfolio.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/application/use_cases/portfolio/list_portfolios.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/portfolio/list_portfolios.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/application/use_cases/portfolio/update_portfolio.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/portfolio/update_portfolio.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/domain/project.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/domain/project.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/infrastructure/models/portfolio_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/portfolio_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/infrastructure/models/program_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/program_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/infrastructure/models/project_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/project_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/user_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/user_repository_sqlalchemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/user_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/portfolio_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/portfolio_repository_sqlalchemy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/program_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/program_repository_sqlalchemy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/portfolio_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/portfolio_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/portfolio_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/portfolio_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/program_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/program_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/project_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/project_schema.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/migrations/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/env.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/52f0b075d653_dev_autogenerate.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/dev_migrate_compose.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/dev_migrate_compose.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/085baa4574f0_verify_2026_01_18t15_45_05z.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/1912bb5a00a8_auto_2026_01_18t15_45_04z.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/76e39c8e8330_init_2026_01_18t15_41_05z.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/9c7b653d863d_verify_2026_01_18t15_41_06z.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/b884dc8fbbd7_auto_2026_01_18t15_42_36z.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/versions/df06ec6d7f39_verify_2026_01_18t15_42_37z.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,26 +80,26 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Makefile Target.logs.executor": "Run",
-    "Makefile Target.revision.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHELLCHECK.PATH": "/Users/Feliz/Library/Application Support/JetBrains/IntelliJIdea2025.2/plugins/Shell Script/shellcheck",
-    "git-widget-placeholder": "main",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/Feliz/Desktop/Development/QMS",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "rearrange.code.on.save": "true",
-    "settings.editor.selected.configurable": "settings.saveactions"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Makefile Target.logs.executor&quot;: &quot;Run&quot;,
+    &quot;Makefile Target.revision.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/Feliz/Library/Application Support/JetBrains/IntelliJIdea2025.2/plugins/Shell Script/shellcheck&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/Feliz/Desktop/Development/QMS&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.saveactions&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/presentation/schemas" />
@@ -168,7 +183,15 @@
       <option name="project" value="LOCAL" />
       <updated>1768508544777</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Fix deleting issue which was not updating DB">
+      <option name="closed" value="true" />
+      <created>1768761307594</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1768761307594</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -191,7 +214,8 @@
     <MESSAGE value="modified user creatiion CRUID operations" />
     <MESSAGE value="updated merge" />
     <MESSAGE value="Added program and portfolio apis" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added program and portfolio apis" />
+    <MESSAGE value="Fix deleting issue which was not updating DB" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix deleting issue which was not updating DB" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -207,7 +231,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/infrastructure/models/program_model.py</url>
-          <line>53</line>
+          <line>56</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>

@@ -45,6 +45,9 @@ class Program(Base):
     )
 
     portfolio: Mapped["Portfolio"] = relationship("Portfolio", back_populates="programs", lazy="joined")
+    # Soft delete fields
+    is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.false())
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
     __table_args__ = (
         # Only one default Program per Portfolio

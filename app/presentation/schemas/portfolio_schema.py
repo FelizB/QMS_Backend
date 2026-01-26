@@ -1,6 +1,11 @@
-from typing import Optional, Any, Dict
+from datetime import datetime
+from typing import Optional, Any, Dict, List
+from uuid import UUID
+
 from pydantic import Field
+
 from .common import CamelModel
+
 
 class PortfolioBase(CamelModel):
     name: str = Field(min_length=2, max_length=200)
@@ -12,8 +17,10 @@ class PortfolioBase(CamelModel):
     is_default: bool = False
     custom_properties: Optional[Dict[str, Any]] = {}
 
+
 class PortfolioCreate(PortfolioBase):
     pass
+
 
 class PortfolioUpdate(CamelModel):
     name: Optional[str] = Field(default=None, min_length=2, max_length=200)
@@ -25,10 +32,26 @@ class PortfolioUpdate(CamelModel):
     is_default: Optional[bool] = None
     custom_properties: Optional[Dict[str, Any]] = None
     # Optimistic concurrency
-    concurrency_guid: str
+    concurrency_guid: UUID
 
-class PortfolioOut(PortfolioBase):
+
+class PortfolioOut(CamelModel):
     id: int
-    guid: str
-    concurrency_guid: str
-    last_updated_date: str
+    name: str
+    is_active: bool
+    is_deleted: bool
+    guid: UUID
+    concurrency_guid: UUID
+    last_updated_date: datetime
+
+
+class PortfolioPagedResult(CamelModel):
+    total: int
+    items: List[PortfolioOut]
+    page: int
+    page_size: int
+
+
+class PortfolioDeleteResponse(CamelModel):
+    message: str
+    data: PortfolioOut

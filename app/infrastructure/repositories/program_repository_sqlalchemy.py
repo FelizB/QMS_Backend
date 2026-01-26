@@ -1,10 +1,13 @@
 from typing import Sequence, Optional
+
+from fastapi import HTTPException
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import HTTPException, status
-from app.infrastructure.models.program_model import Program
+
 from app.infrastructure.models.portfolio_model import Portfolio
+from app.infrastructure.models.program_model import Program
+
 
 class ProgramRepository:
     def __init__(self, session: AsyncSession):
@@ -29,7 +32,8 @@ class ProgramRepository:
         res = await self.session.execute(select(Program).where(Program.id == program_id))
         return res.scalar_one_or_none()
 
-    async def list_by_portfolio(self, portfolio_id: int, skip: int = 0, limit: int = 50, q: str | None = None) -> Sequence[Program]:
+    async def list_by_portfolio(self, portfolio_id: int, skip: int = 0, limit: int = 50, q: str | None = None) -> \
+            Sequence[Program]:
         stmt = select(Program).where(Program.portfolio_id == portfolio_id).offset(skip).limit(limit)
         if q:
             stmt = stmt.where(Program.name.ilike(f"%{q}%"))
@@ -61,6 +65,8 @@ class ProgramRepository:
             update(Program)
             .where(Program.id == program_id)
             .where(Program.concurrency_guid == concurrency_guid)
+            .where(Program.is_deleted == False)
+            .returning(Program)
             .values(is_active=False)
             .returning(Program)
         )

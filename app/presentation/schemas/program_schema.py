@@ -1,6 +1,10 @@
 from typing import Optional, Any, Dict
+from uuid import UUID
+
 from pydantic import Field
+
 from .common import CamelModel
+
 
 class ProgramBase(CamelModel):
     name: str = Field(min_length=2, max_length=200)
@@ -14,8 +18,10 @@ class ProgramBase(CamelModel):
     is_default: bool = False
     custom_properties: Optional[Dict[str, Any]] = {}
 
+
 class ProgramCreate(ProgramBase):
     pass
+
 
 class ProgramUpdate(CamelModel):
     name: Optional[str] = None
@@ -29,10 +35,11 @@ class ProgramUpdate(CamelModel):
     is_default: Optional[bool] = None
     custom_properties: Optional[Dict[str, Any]] = None
     # Optimistic concurrency
-    concurrency_guid: str
+    concurrency_guid: UUID
+
 
 class ProgramOut(ProgramBase):
     id: int
-    guid: str
-    concurrency_guid: str
-    last_updated_date: str
+    guid: UUID
+    concurrency_guid: UUID
+    last_updated_date: UUID

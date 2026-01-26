@@ -1,6 +1,8 @@
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
-from typing import Optional
 from datetime import datetime, date
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
 
 class ProjectBase(BaseModel):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
@@ -8,6 +10,7 @@ class ProjectBase(BaseModel):
     ProjectGroupId: Optional[int] = None
     Name: str = Field(min_length=1, max_length=255)
     Description: Optional[str] = None
+    Environment: str = Field(min_length=1, max_length=255)
     Website: Optional[str] = None
     Active: Optional[bool] = True
     Status: Optional[str] = "New"
@@ -34,9 +37,11 @@ class ProjectBase(BaseModel):
             raise ValueError("EndDate cannot be earlier than StartDate.")
         return end
 
+
 class ProjectCreate(ProjectBase):
     # CreationDate is set by the DB; Name is only required field in the request.
     pass
+
 
 class ProjectUpdate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -44,9 +49,10 @@ class ProjectUpdate(BaseModel):
     ProjectGroupId: Optional[int] = None
     Name: Optional[str] = Field(default=None, min_length=1, max_length=255)
     Description: Optional[str] = None
+    Environment: Optional[str] = None
     Website: Optional[str] = None
     Active: Optional[bool] = None
-    Status:Optional[str] = None
+    Status: Optional[str] = None
     WorkingHours: Optional[int] = Field(default=None, ge=0)
     WorkingDays: Optional[int] = Field(default=None, ge=0, le=7)
     NonWorkingHours: Optional[int] = Field(default=None, ge=0)
@@ -54,13 +60,16 @@ class ProjectUpdate(BaseModel):
     EndDate: Optional[date] = None
     PercentComplete: Optional[int] = Field(default=None, ge=0, le=100)
 
+
 class ProjectOut(ProjectBase):
     ProjectId: int
     CreationDate: datetime
 
+
 class ProjectSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     ProjectId: int
+    Environment: str
     Name: str
     Active: bool
     PercentComplete: Optional[int] = None

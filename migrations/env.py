@@ -39,7 +39,8 @@ if db_url:
 # Import Base and ensure ALL model modules are imported so metadata is complete
 from app.infrastructure.models.base import Base
 # Import each model module so tables register on Base.metadata
-from app.infrastructure.models import user_model, project_model, portfolio_model, program_model  # noqa: F401
+from app.infrastructure.models import user_model, project_model, portfolio_model, program_model, \
+    testcase_model  # noqa: F401
 
 target_metadata = Base.metadata
 

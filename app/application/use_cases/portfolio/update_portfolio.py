@@ -1,6 +1,6 @@
-from fastapi import HTTPException
 from app.application.interfaces.portfolio_repository import IPortfolioRepository
 from app.presentation.schemas.portfolio_schema import PortfolioUpdate, PortfolioOut
+
 
 class UpdatePortfolioUseCase:
     def __init__(self, repo: IPortfolioRepository) -> None:
@@ -10,7 +10,7 @@ class UpdatePortfolioUseCase:
         data = payload.model_dump(exclude_unset=True)
         concurrency_guid = data.pop("concurrency_guid")
         try:
-            updated = await self.repo.update_with_concurrency(portfolio_id, data, concurrency_guid)
+            updated = await self.repo.update(portfolio_id, data, concurrency_guid)
         except Exception as e:
             # your repo can raise HTTPException(409, ...) or IntegrityError mapped to HTTPException
             raise
