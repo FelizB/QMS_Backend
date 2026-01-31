@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Sequence
 
 from sqlalchemy import select, func, desc
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,6 +43,43 @@ class TestCaseRepository:
             )
         )
         return res.scalar_one_or_none()
+
+    async def get(self, test_case_id: int) -> Optional[TestCase]:
+        res = await self.session.execute(
+            self._base_query().where(
+                TestCase.id == test_case_id,
+            )
+        )
+        return res.scalar_one_or_none()
+
+    async def list_by_project(
+            self,
+            project_id: int,
+            q: str | None = None,
+            offset: int = 0,
+            limit: int = 50,
+            include_deleted: bool = False,
+    ) -> Sequence[TestCase]:
+        conditions = [TestCase.project_id == project_id]
+        if not include_deleted:
+            conditions.append(TestCase.is_deleted.is_(False))
+        if q:
+            # case-insensitive search in name/description
+            like = f"%{q}%"
+            conditions.append(
+                func.lower(TestCase.name).like(func.lower(like)) |
+                func.lower(TestCase.description).like(func.lower(like))
+            )
+
+        stmt = (
+            select(TestCase)
+            .where(*conditions)
+            .order_by(TestCase.id.asc())  # or created_at desc
+            .offset(offset)
+            .limit(limit)
+        )
+        res = await self.session.execute(stmt)
+        return res.scalars().all()
 
     async def soft_delete(self, project_id: int, test_case_id: int) -> bool:
         obj = await self.get_by_id(project_id, test_case_id)

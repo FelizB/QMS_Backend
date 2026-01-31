@@ -4,7 +4,7 @@ from datetime import datetime, date
 from typing import Optional
 
 import sqlalchemy as sa
-from sqlalchemy import String, Integer, Boolean, DateTime, Date, Text
+from sqlalchemy import String, Integer, Boolean, DateTime, Date, Text, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -17,16 +17,22 @@ class Project(Base):
     # Keys / Ids
     project_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     project_template_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    project_group_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-
+    program_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("programs.id", ondelete="RESTRICT"),  # or CASCADE if you want
+        nullable=False,
+        index=True,
+    )
     # Basic info
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     website: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
-    Environment: Mapped[Optional[str]] = mapped_column(String(2048), nullable=False)
+    environment: Mapped[Optional[str]] = mapped_column(String(2048), nullable=False)
 
     # Dates / status
     creation_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now(),
+                                                   onupdate=func.now())
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.true())
     status: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
 

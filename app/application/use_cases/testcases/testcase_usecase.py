@@ -23,12 +23,33 @@ class UpdateTestCaseWithSteps:
         return await self.repo.update_with_steps(project_id, payload)
 
 
-class GetTestCaseById:
+class GetTestCase:
     def __init__(self, session: AsyncSession):
         self.repo = TestCaseRepository(session)
 
     async def __call__(self, project_id: int, test_case_id: int) -> Optional[TestCase]:
         return await self.repo.get_by_id(project_id, test_case_id)
+
+
+class GetTestCaseById:
+    def __init__(self, session: AsyncSession):
+        self.repo = TestCaseRepository(session)
+
+    async def __call__(self, test_case_id: int) -> Optional[TestCase]:
+        return await self.repo.get(test_case_id)
+
+
+class ListProjectTestCases:
+    def __init__(self, session):
+        self.repo = TestCaseRepository(session)
+
+    async def __call__(self, project_id: int, q: str | None, page: int, size: int, include_deleted: bool):
+        offset = (page - 1) * size
+        items = await self.repo.list_by_project(
+            project_id=project_id, q=q, offset=offset, limit=size, include_deleted=include_deleted
+        )
+        # If you need total count, add a count() query in repo; otherwise just return items.
+        return items
 
 
 class SoftDeleteTestCase:

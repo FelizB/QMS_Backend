@@ -1,21 +1,28 @@
+from datetime import datetime, timezone
 from typing import Optional, Sequence, Mapping, Any
-from sqlalchemy.ext.asyncio import AsyncSession
+
 from sqlalchemy import select, update, delete
 from sqlalchemy.exc import IntegrityError
-from app.infrastructure.models.project_model import Project
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.application.interfaces.project_repository import IProjectRepository
+from app.infrastructure.models.project_model import Project
+
 
 class SQLAlchemyProjectRepository(IProjectRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def list(self, limit: int = 50, offset: int = 0) -> Sequence[Project]:
-        stmt = select(Project).offset(offset).limit(limit)
+        stmt = select(Project).where(Project.is_deleted.is_(False)).offset(offset).limit(limit)
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
     async def get_by_id(self, project_id: int) -> Optional[Project]:
-        return await self.session.get(Project, project_id)
+        obj = await self.session.get(Project, project_id)
+        if getattr(obj, "is_deleted", True):
+            return None
+        return obj
 
     async def create(self, data: Mapping[str, Any]) -> Project:
         obj = Project(**data)
@@ -33,9 +40,9 @@ class SQLAlchemyProjectRepository(IProjectRepository):
             return await self.get_by_id(project_id)
         stmt = (
             update(Project)
-            .where(Project.ProjectId == project_id)
+            .where(Project.project_id == project_id, Project.is_deleted.is_(False))
             .values(**fields)
-            .returning(Project.ProjectId)
+            .returning(Project.project_id)
         )
         res = await self.session.execute(stmt)
         returned_id = res.scalar_one_or_none()
@@ -46,7 +53,8 @@ class SQLAlchemyProjectRepository(IProjectRepository):
         return await self.get_by_id(project_id)
 
     async def delete(self, project_id: int) -> bool:
-        stmt = delete(Project).where(Project.ProjectId == project_id).returning(Project.ProjectId)
+        stmt = delete(Project).where(Project.project_id == project_id, Project.is_deleted.is_(False)).returning(
+            Project.project_id)
         res = await self.session.execute(stmt)
         returned_id = res.scalar_one_or_none()
         if not returned_id:
@@ -60,7 +68,12 @@ class SQLAlchemyProjectRepository(IProjectRepository):
         obj = await self.session.get(Project, project_id)
         if not obj:
             return None
+        if getattr(obj, "is_deleted", False):
+            return None
+
         obj.is_deleted = True
-        obj.deleted_at = os.datetime.now(timezone.utc)
+        obj.is_active = False
+        obj.deleted_at = datetime.now(timezone.utc)
         await self.session.commit()
+        await self.session.refresh(obj)
         return obj

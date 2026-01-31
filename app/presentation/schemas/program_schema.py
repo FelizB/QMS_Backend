@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, Any, Dict
 from uuid import UUID
 
@@ -42,4 +43,16 @@ class ProgramOut(ProgramBase):
     id: int
     guid: UUID
     concurrency_guid: UUID
-    last_updated_date: UUID
+    last_updated_date: datetime
+
+
+class ProgramDeleteSummaryOut(CamelModel):
+    id: int
+    guid: UUID
+    concurrency_guid: UUID
+    last_updated_date: datetime
+
+
+class ProgramDeleteResponse(CamelModel):
+    message: str
+    data: ProgramDeleteSummaryOut

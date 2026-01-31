@@ -64,3 +64,7 @@ class PagedResult(BaseModel):
     items: List[TestCaseOut]
     page: int
     page_size: int
+
+
+class CountOut(BaseModel):
+    total: int

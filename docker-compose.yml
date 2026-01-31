@@ -5,6 +5,9 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
+      TZ: Africa/Nairobi
+      PGTZ: Africa/Nairobi
+
     ports:
       - "${DB_PORT}:5432"
     volumes:
@@ -18,8 +21,10 @@ services:
         required: true
     environment:
       DB_URL: ${MIGRATIONS_DB_URL}
-    entrypoint: ["alembic"]
-    command: ["-c","alembic.ini","current","-v"]
+      TZ: Africa/Nairobi
+      PGTZ: Africa/Nairobi
+    entrypoint: [ "alembic" ]
+    command: [ "-c","alembic.ini","current","-v" ]
     restart: "no"
     volumes:
       - .:/app
@@ -27,7 +32,7 @@ services:
 
   api:
     build: .
-    profiles: ["dev"]
+    profiles: [ "dev" ]
     volumes:
       - .:/app
     working_dir: /app
@@ -43,10 +48,12 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       DB_URL: ${APP_DB_URL}   # ASYNC URL; host 'db' inside Compose
       PYTHONPATH: /app
+      TZ: Africa/Nairobi
+      PGTZ: Africa/Nairobi
     ports:
       - "${APP_PORT}:8000"
-    entrypoint: ["uvicorn"]
-    command: ["app.main:app","--host","0.0.0.0","--port","8000","--reload","--reload-dir","app"]
+    entrypoint: [ "uvicorn" ]
+    command: [ "app.main:app","--host","0.0.0.0","--port","8000","--reload","--reload-dir","app" ]
 
 volumes:
   pgdata:

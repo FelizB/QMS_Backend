@@ -3,39 +3,44 @@ from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.presentation.schemas.common import CamelModel
+
 
 class ProjectBase(BaseModel):
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
-    ProjectTemplateId: Optional[int] = None
-    ProjectGroupId: Optional[int] = None
-    Name: str = Field(min_length=1, max_length=255)
-    Description: Optional[str] = None
-    Environment: str = Field(min_length=1, max_length=255)
-    Website: Optional[str] = None
-    Active: Optional[bool] = True
-    Status: Optional[str] = "New"
-    WorkingHours: Optional[int] = Field(default=None, ge=0)
-    WorkingDays: Optional[int] = Field(default=None, ge=0, le=7)
-    NonWorkingHours: Optional[int] = Field(default=None, ge=0)
-    StartDate: Optional[date] = None
-    EndDate: Optional[date] = None
-    PercentComplete: Optional[int] = Field(default=None, ge=0, le=100)
+    program_id: int = Field(...)
+    project_template_id: Optional[int] = None
+    name: str = Field(min_length=1, max_length=255)
+    description: Optional[str] = None
+    environment: str = Field(min_length=1, max_length=255)
+    website: Optional[str] = None
+    is_active: Optional[bool] = True
+    status: Optional[str] = "New"
+    working_hours: Optional[int] = Field(default=None, ge=0)
+    working_days: Optional[int] = Field(default=None, ge=0, le=7)
+    non_working_hours: Optional[int] = Field(default=None, ge=0)
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    percent_complete: Optional[int] = Field(default=None, ge=0, le=100)
+    updated_date: Optional[datetime] = Field(default=None, nullable=True)
 
-    @field_validator("Website")
-    @classmethod
-    def validate_website(cls, v):
-        if v is None or v.strip() == "":
-            return None
-        # simple normalization; for strict, use HttpUrl type
-        return v.strip()
 
-    @field_validator("EndDate")
-    @classmethod
-    def validate_dates(cls, end, info):
-        start = info.data.get("StartDate")
-        if start and end and end < start:
-            raise ValueError("EndDate cannot be earlier than StartDate.")
-        return end
+@field_validator("website")
+@classmethod
+def validate_website(cls, v):
+    if v is None or v.strip() == "":
+        return None
+    # simple normalization; for strict, use HttpUrl type
+    return v.strip()
+
+
+@field_validator("end_date")
+@classmethod
+def validate_dates(cls, end, info):
+    start = info.data.get("start_date")
+    if start and end and end < start:
+        raise ValueError("EndDate cannot be earlier than StartDate.")
+    return end
 
 
 class ProjectCreate(ProjectBase):
@@ -45,31 +50,42 @@ class ProjectCreate(ProjectBase):
 
 class ProjectUpdate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    ProjectTemplateId: Optional[int] = None
-    ProjectGroupId: Optional[int] = None
-    Name: Optional[str] = Field(default=None, min_length=1, max_length=255)
-    Description: Optional[str] = None
-    Environment: Optional[str] = None
-    Website: Optional[str] = None
-    Active: Optional[bool] = None
-    Status: Optional[str] = None
-    WorkingHours: Optional[int] = Field(default=None, ge=0)
-    WorkingDays: Optional[int] = Field(default=None, ge=0, le=7)
-    NonWorkingHours: Optional[int] = Field(default=None, ge=0)
-    StartDate: Optional[date] = None
-    EndDate: Optional[date] = None
-    PercentComplete: Optional[int] = Field(default=None, ge=0, le=100)
+    project_template_id: Optional[int] = None
+    name: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    description: Optional[str] = None
+    environment: Optional[str] = None
+    website: Optional[str] = None
+    is_active: Optional[bool] = None
+    status: Optional[str] = None
+    working_hours: Optional[int] = Field(default=None, ge=0)
+    working_days: Optional[int] = Field(default=None, ge=0, le=7)
+    non_working_hours: Optional[int] = Field(default=None, ge=0)
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    percent_complete: Optional[int] = Field(default=None, ge=0, le=100)
 
 
 class ProjectOut(ProjectBase):
-    ProjectId: int
-    CreationDate: datetime
+    project_id: int
+    creation_date: datetime
 
 
 class ProjectSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
-    ProjectId: int
-    Environment: str
-    Name: str
-    Active: bool
-    PercentComplete: Optional[int] = None
+    project_id: int
+    environment: str
+    name: str
+    is_active: bool
+    percent_complete: Optional[int] = None
+
+
+class ProjectSummaryDelete(CamelModel):
+    project_id: int
+    name: str
+    updated_date: datetime
+    is_active: bool
+
+
+class ProjectDeleteOut(BaseModel):
+    message: str
+    data: ProjectSummaryDelete

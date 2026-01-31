@@ -29,12 +29,21 @@ class ProgramRepository:
         return obj
 
     async def get(self, program_id: int) -> Optional[Program]:
-        res = await self.session.execute(select(Program).where(Program.id == program_id))
+        res = await self.session.execute(select(Program).where(Program.id == program_id, Program.is_deleted.is_(False)))
         return res.scalar_one_or_none()
 
     async def list_by_portfolio(self, portfolio_id: int, skip: int = 0, limit: int = 50, q: str | None = None) -> \
             Sequence[Program]:
-        stmt = select(Program).where(Program.portfolio_id == portfolio_id).offset(skip).limit(limit)
+        stmt = select(Program).where(Program.portfolio_id == portfolio_id, Program.is_deleted.is_(False)).offset(
+            skip).limit(limit)
+        if q:
+            stmt = stmt.where(Program.name.ilike(f"%{q}%"))
+        res = await self.session.execute(stmt.order_by(Program.id.desc()))
+        return res.scalars().all()
+
+    async def list_all(self, skip: int = 0, limit: int = 50, q: str | None = None) -> \
+            Sequence[Program]:
+        stmt = select(Program).where(Program.is_deleted.is_(False)).offset(skip).limit(limit)
         if q:
             stmt = stmt.where(Program.name.ilike(f"%{q}%"))
         res = await self.session.execute(stmt.order_by(Program.id.desc()))
@@ -45,11 +54,11 @@ class ProgramRepository:
         if "portfolio_id" in data and data["portfolio_id"] is not None:
             p = await self.session.get(Portfolio, data["portfolio_id"])
             if not p:
-                raise HTTPException(status_code=400, detail="New portfolio does not exist")
+                raise HTTPException(status_code=400, detail="Portfolio does not exist")
 
         stmt = (
             update(Program)
-            .where(Program.id == program_id)
+            .where(Program.id == program_id, Program.is_deleted.is_(False))
             .where(Program.concurrency_guid == concurrency_guid)
             .values(**data)
             .returning(Program)
@@ -68,6 +77,7 @@ class ProgramRepository:
             .where(Program.is_deleted == False)
             .returning(Program)
             .values(is_active=False)
+            .values(is_deleted=True)
             .returning(Program)
         )
         res = await self.session.execute(stmt)
