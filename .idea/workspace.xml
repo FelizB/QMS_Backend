@@ -4,34 +4,32 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="Fixed soft delete and other issues within the portfolio classes">
-      <change afterPath="$PROJECT_DIR$/app/application/use_cases/program/liast_all_programs.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/application/use_cases/teststeps/teststep_usecases.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/domain/errors.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/teststep_repository_sqlalchemy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/teststep_routes.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/teststep_schema.py" afterDir="false" />
+    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="Some cleaning on step,cases APIs">
+      <change afterPath="$PROJECT_DIR$/app/application/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/application/services/file_type.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/application/services/file_upload_rules.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/application/use_cases/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/analytics_service.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/application/use_cases/file_upload/files_usecase.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/application/validators/attachments.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/application/validators/file_policy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/models/file_attachment_model.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/analytics_repository_sqlalchemy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/file_upload_repository_sqlalchemy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/storage/local_storage.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/analytics_router.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/file_routes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/debug_handlers.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/analytics_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/interfaces/program_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/interfaces/program_repository.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/program/delete_program.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/program/delete_program.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/program/get_program.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/program/get_program.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/program/update_program.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/program/update_program.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/projects/create_project.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/projects/create_project.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/projects/delete_project.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/projects/delete_project.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/testcases/testcase_usecase.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/testcases/testcase_usecase.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/project_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/project_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/testcase_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/testcase_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/program_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/program_repository_sqlalchemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/project_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/project_repository_sqlalchemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/test_case_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/test_case_repository_sqlalchemy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/program_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/program_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/project_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/project_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/testcase_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/testcase_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/program_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/program_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/project_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/project_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/testcase_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/testcase_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/teststep_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/teststep_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/dependencies/current_user.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/dependencies/current_user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +65,7 @@
     <setting file="file://$PROJECT_DIR$/.venv/lib/python3.13/site-packages/app/__init__.py" root0="SKIP_INSPECTION" />
   </component>
   <component name="ProblemsViewState">
-    <option name="selectedTabId" value="Security Analysis" />
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
@@ -99,6 +97,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/application/use_cases/analytics" />
       <recent name="$PROJECT_DIR$/app/presentation/schemas" />
       <recent name="$PROJECT_DIR$/app/infrastructure/models" />
       <recent name="$PROJECT_DIR$" />
@@ -196,7 +195,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769460363322</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Some cleaning on step,cases APIs">
+      <option name="closed" value="true" />
+      <created>1769869516431</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1769869516431</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -221,7 +228,8 @@
     <MESSAGE value="Added program and portfolio apis" />
     <MESSAGE value="Fix deleting issue which was not updating DB" />
     <MESSAGE value="Fixed soft delete and other issues within the portfolio classes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed soft delete and other issues within the portfolio classes" />
+    <MESSAGE value="Some cleaning on step,cases APIs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Some cleaning on step,cases APIs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -230,10 +238,6 @@
           <url>file://$PROJECT_DIR$/app/alembic2/env.py</url>
           <line>17</line>
           <option name="timeStamp" value="1" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/core/settings.py</url>
-          <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/infrastructure/models/program_model.py</url>

@@ -40,7 +40,7 @@ async def update_test_step(step_id: int, payload: TestStepUpdate, repos=Depends(
     return await uc.execute(step_id, payload)
 
 
-@step_router.delete("/{step_id}", response_description=str)
+@step_router.delete("/{step_id}", response_description="Delete a test step by ID")
 async def delete_test_step(step_id: int, repos=Depends(get_repos)):
     steps_repo, _ = repos
     uc = DeleteTestStepUseCase(steps_repo)

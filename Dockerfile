@@ -20,7 +20,8 @@ RUN pip install --no-cache-dir \
     pydantic \
     pydantic-settings\
     passlib\
-    'pydantic[email]'
+    'pydantic[email]'\
+    python-multipart
 
 #ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1

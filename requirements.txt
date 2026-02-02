@@ -10,3 +10,4 @@ alembic
 pydantic
 pydantic-settings
 passlib
+python-multipart
