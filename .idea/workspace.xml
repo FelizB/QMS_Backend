@@ -4,32 +4,26 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="Some cleaning on step,cases APIs">
-      <change afterPath="$PROJECT_DIR$/app/application/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/application/services/file_type.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/application/services/file_upload_rules.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/application/use_cases/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/analytics_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/application/use_cases/file_upload/files_usecase.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/application/validators/attachments.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/application/validators/file_policy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/models/file_attachment_model.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/analytics_repository_sqlalchemy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/file_upload_repository_sqlalchemy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/storage/local_storage.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/analytics_router.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/file_routes.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/debug_handlers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/analytics_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="Added Analytics APIs">
+      <change afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/portfolio_analytics_usecase.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/programs_analytics_usecase.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/models/lookup_model.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/lookup_repository_sqlalchemy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/portfolio_analytics_repository_sqlalchemy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/program_analytics_repo_sqlalchemy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/lookup_router.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/portfolio_analytics_route.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/program_analytics_route.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/lookup_schema.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/portfolio_analytics_schema.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/program_analytics_schema.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/core/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/application/use_cases/analytics/analytics_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/analytics_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/analytics_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/analytics_repository_sqlalchemy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/teststep_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/teststep_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/dependencies/current_user.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/dependencies/current_user.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/analytics_router.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/analytics_router.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/analytics_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/analytics_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/env.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -203,7 +197,15 @@
       <option name="project" value="LOCAL" />
       <updated>1769869516431</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Added Analytics APIs">
+      <option name="closed" value="true" />
+      <created>1770029111128</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1770029111128</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -229,7 +231,8 @@
     <MESSAGE value="Fix deleting issue which was not updating DB" />
     <MESSAGE value="Fixed soft delete and other issues within the portfolio classes" />
     <MESSAGE value="Some cleaning on step,cases APIs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Some cleaning on step,cases APIs" />
+    <MESSAGE value="Added Analytics APIs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Analytics APIs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -243,6 +246,20 @@
           <url>file://$PROJECT_DIR$/app/infrastructure/models/program_model.py</url>
           <line>56</line>
           <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/infrastructure/models/base.py</url>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/application/use_cases/analytics/analytics_service.py</url>
+          <line>214</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/app/infrastructure/repositories/analytics_repository_sqlalchemy.py</url>
+          <line>474</line>
+          <option name="timeStamp" value="8" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

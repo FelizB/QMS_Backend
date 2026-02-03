@@ -6,7 +6,9 @@ from app.core.settings import settings
 from app.domain.errors import OwnershipError, DomainError
 from app.presentation.controllers.analytics_router import analytics_router
 from app.presentation.controllers.file_routes import file_router
+from app.presentation.controllers.portfolio_analytics_route import p_router
 from app.presentation.controllers.portfolio_routes import portfolio_router
+from app.presentation.controllers.program_analytics_route import program_a_router
 from app.presentation.controllers.program_routes import program_router
 from app.presentation.controllers.project_routes import projects_router
 from app.presentation.controllers.testcase_routes import test_router
@@ -25,6 +27,8 @@ app.include_router(step_router, prefix=settings.api_prefix)
 app.include_router(testcase_router, prefix=settings.api_prefix)
 app.include_router(file_router, prefix=settings.api_prefix)
 app.include_router(analytics_router, prefix=settings.api_prefix)
+app.include_router(p_router, prefix=settings.api_prefix)
+app.include_router(program_a_router, prefix=settings.api_prefix)
 install_debug_handlers(app)
 
 

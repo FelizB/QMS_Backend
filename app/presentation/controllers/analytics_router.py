@@ -8,13 +8,18 @@ from app.application.use_cases.analytics.analytics_service import ProjectAnalyti
 from app.core.db import get_session
 from app.infrastructure.repositories.analytics_repository_sqlalchemy import ProjectAnalyticsRepository
 from app.presentation.schemas.analytics_schema import TestCaseSummaryOut, TestStepSummaryOut, TrendPointOut, \
-    TestCaseBreakdownOut, CasesWithoutStepsOut
+    TestCaseBreakdownOut, CasesWithoutStepsOut, AgingMetricsOut, LongestCasesOut, ReleaseCoverageOut, PriorityHealthOut, \
+    TestCaseBreakdownLabeledOut, LabeledCount
 
-analytics_router = APIRouter(prefix="/analytics/projects", tags=["analytics"])
+analytics_router = APIRouter(prefix="/analytics/projects", tags=["project analytics"])
 
 
 def svc(session: AsyncSession) -> ProjectAnalyticsService:
     return ProjectAnalyticsService(ProjectAnalyticsRepository(session))
+
+
+def svp(session: AsyncSession) -> ProjectAnalyticsRepository:
+    return ProjectAnalyticsRepository(session)
 
 
 @analytics_router.get("/{project_id}/test-cases/summary", response_model=TestCaseSummaryOut)
@@ -94,4 +99,98 @@ async def get_cases_without_steps(
         folder_id=folder_id,
         include_ids=include_ids,
         limit=limit,
+    )
+
+
+#  ---- Aging Cases ----
+@analytics_router.get("/{project_id}/test-cases/aging", response_model=AgingMetricsOut)
+async def get_aging_metrics(
+        project_id: int,
+        include_deleted: bool = Query(False),
+        release_id: Optional[int] = Query(None),
+        folder_id: Optional[int] = Query(None),
+        stale_days: int = Query(30, ge=1, le=3650, description="Threshold in days for 'stale' counts"),
+        session: AsyncSession = Depends(get_session),
+):
+    return await svc(session).get_aging_metrics(project_id, include_deleted, release_id, folder_id, stale_days)
+
+
+# ---- Longest cases ----
+@analytics_router.get("/{project_id}/test-cases/longest", response_model=LongestCasesOut)
+async def get_longest_cases(
+        project_id: int,
+        include_deleted: bool = Query(False),
+        release_id: Optional[int] = Query(None),
+        folder_id: Optional[int] = Query(None),
+        limit: int = Query(20, ge=1, le=500),
+        session: AsyncSession = Depends(get_session),
+):
+    return await svc(session).get_longest_cases(project_id, include_deleted, release_id, folder_id, limit)
+
+
+# ---- Release coverage ----
+@analytics_router.get("/{project_id}/releases/coverage", response_model=ReleaseCoverageOut)
+async def get_release_coverage(
+        project_id: int,
+        include_deleted: bool = Query(False),
+        session: AsyncSession = Depends(get_session),
+):
+    return await svc(session).get_release_coverage(project_id, include_deleted)
+
+
+# ---- Priority health ----
+def parse_csv_ints(csv: Optional[str]) -> List[int]:
+    if not csv:
+        return []
+    return [int(x.strip()) for x in csv.split(",") if x.strip().isdigit()]
+
+
+@analytics_router.get("/{project_id}/test-cases/priority-health", response_model=PriorityHealthOut)
+async def get_priority_health(
+        project_id: int,
+        high_priority_ids: Optional[str] = Query(None,
+                                                 description="CSV of priority_id values considered 'high' e.g. '1,2'"),
+        include_deleted: bool = Query(False),
+        release_id: Optional[int] = Query(None),
+        folder_id: Optional[int] = Query(None),
+        stale_days: int = Query(30, ge=1, le=3650),
+        session: AsyncSession = Depends(get_session),
+):
+    hp = parse_csv_ints(high_priority_ids) or [1]  # default: priority_id 1
+    return await svc(session).get_priority_health(project_id, hp, include_deleted, release_id, folder_id, stale_days)
+
+
+@analytics_router.get("/{project_id}/test-cases/breakdown-labeled", response_model=TestCaseBreakdownLabeledOut)
+async def get_test_case_breakdown_labeled(
+
+        project_id: int,
+        include_deleted: bool = False,
+        release_id: Optional[int] = None,
+        folder_id: Optional[int] = None,
+        include_nulls: bool = False,
+        session: AsyncSession = Depends(get_session),
+) -> TestCaseBreakdownLabeledOut:
+    pr = await svp(session).breakdown_by_priority_with_labels(
+        project_id, include_deleted, release_id, folder_id, include_nulls
+    )
+    pv = await svp(session).breakdown_by_priority_with_labels(project_id, include_deleted, release_id, folder_id,
+                                                              include_nulls)
+    print("PR:", pv, type(pv))
+    ty = await svp(session).breakdown_by_type_with_labels(
+        project_id, include_deleted, release_id, folder_id, include_nulls
+    )
+    pr_items = [
+        LabeledCount(id=i, label=lbl, count=c, sort_order=so)
+        for (i, lbl, c, so) in pr
+    ]
+    ty_items = [
+        LabeledCount(id=i, label=lbl, count=c, sort_order=so)
+        for (i, lbl, c, so) in ty
+    ]
+    print("TR:", ty, type(ty))
+    return TestCaseBreakdownLabeledOut(
+        project_id=project_id,
+        include_deleted=include_deleted,
+        by_priority=pr_items,
+        by_type=ty_items,
     )
