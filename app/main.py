@@ -11,6 +11,7 @@ from app.presentation.controllers.portfolio_routes import portfolio_router
 from app.presentation.controllers.program_analytics_route import program_a_router
 from app.presentation.controllers.program_routes import program_router
 from app.presentation.controllers.project_routes import projects_router
+from app.presentation.controllers.testcase_analytics_route import testcase_analytics_router
 from app.presentation.controllers.testcase_routes import test_router
 from app.presentation.controllers.testcase_routes import testcase_router
 from app.presentation.controllers.teststep_routes import step_router
@@ -29,6 +30,7 @@ app.include_router(file_router, prefix=settings.api_prefix)
 app.include_router(analytics_router, prefix=settings.api_prefix)
 app.include_router(p_router, prefix=settings.api_prefix)
 app.include_router(program_a_router, prefix=settings.api_prefix)
+app.include_router(testcase_analytics_router, prefix=settings.api_prefix)
 install_debug_handlers(app)
 
 

@@ -12,6 +12,7 @@ class TestStepBase(BaseModel):
 
 class TestStepCreate(TestStepBase):
     test_case_id: int
+    test_step_status_id: int
     sequence: Optional[int] = Field(None, ge=1, description="If omitted, will be appended at the end")
 
 

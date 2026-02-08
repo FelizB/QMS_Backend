@@ -4,26 +4,17 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="Added Analytics APIs">
-      <change afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/portfolio_analytics_usecase.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/programs_analytics_usecase.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/models/lookup_model.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/lookup_repository_sqlalchemy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/portfolio_analytics_repository_sqlalchemy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/program_analytics_repo_sqlalchemy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/lookup_router.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/portfolio_analytics_route.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/program_analytics_route.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/lookup_schema.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/portfolio_analytics_schema.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/program_analytics_schema.py" afterDir="false" />
+    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="Added analytics APIs for portfolio and projects">
+      <change afterPath="$PROJECT_DIR$/app/application/services/case_rules.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/testcase_analytics_usecase.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/testcase_analytics_repository_sqlalchemy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/testcase_next_analytics_repository_sqlalchemy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/testcase_analytics_route.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/testcase_analytics_schema.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/analytics/analytics_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/analytics_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/analytics_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/analytics_repository_sqlalchemy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/testcase_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/testcase_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/analytics_router.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/analytics_router.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/analytics_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/analytics_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/teststep_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/teststep_schema.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -205,7 +196,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770029111128</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="Added analytics APIs for portfolio and projects">
+      <option name="closed" value="true" />
+      <created>1770127732623</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1770127732623</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -232,7 +231,8 @@
     <MESSAGE value="Fixed soft delete and other issues within the portfolio classes" />
     <MESSAGE value="Some cleaning on step,cases APIs" />
     <MESSAGE value="Added Analytics APIs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Analytics APIs" />
+    <MESSAGE value="Added analytics APIs for portfolio and projects" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added analytics APIs for portfolio and projects" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
