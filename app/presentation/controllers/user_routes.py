@@ -2,26 +2,16 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.application.use_cases.create_user_usecase import CreateUserUseCase
 from app.application.use_cases.delete_user_usecase import DeleteUserUseCase
 from app.core.db import get_session
 from app.infrastructure.repositories.user_repository_sqlalchemy import SQLAlchemyUserRepository
-from app.presentation.schemas.user_schema import UserCreate, UserSummary, UserUpdate, UserDeleteResponse
+from app.presentation.schemas.user_schema import UserSummary, UserUpdate, UserDeleteResponse
 
 user_router = APIRouter(prefix="/users", tags=["users"])
 
 
 def get_user_repo(session: AsyncSession = Depends(get_session)):
     return SQLAlchemyUserRepository(session)
-
-
-@user_router.post("/", response_model=UserSummary, status_code=201)
-async def create_user(payload: UserCreate, repo=Depends(get_user_repo)):
-    uc = CreateUserUseCase(repo)
-    try:
-        return await uc.execute(payload)
-    except ValueError as ex:
-        raise HTTPException(status_code=409, detail=str(ex))
 
 
 @user_router.get("/", response_model=list[UserSummary])

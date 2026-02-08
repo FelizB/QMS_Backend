@@ -1,10 +1,11 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.responses import RedirectResponse, JSONResponse
 from starlette.status import HTTP_409_CONFLICT, HTTP_400_BAD_REQUEST, HTTP_422_UNPROCESSABLE_ENTITY
 
 from app.core.settings import settings
 from app.domain.errors import OwnershipError, DomainError
 from app.presentation.controllers.analytics_router import analytics_router
+from app.presentation.controllers.auth_routes import auth_router
 from app.presentation.controllers.file_routes import file_router
 from app.presentation.controllers.portfolio_analytics_route import p_router
 from app.presentation.controllers.portfolio_routes import portfolio_router
@@ -17,20 +18,22 @@ from app.presentation.controllers.testcase_routes import testcase_router
 from app.presentation.controllers.teststep_routes import step_router
 from app.presentation.controllers.user_routes import user_router
 from app.presentation.debug_handlers import install_debug_handlers
+from app.presentation.dependencies.auth import get_current_user
 
 app = FastAPI(title=settings.app_name)
-app.include_router(user_router, prefix=settings.api_prefix)
-app.include_router(portfolio_router, prefix=settings.api_prefix)
-app.include_router(program_router, prefix=settings.api_prefix)
-app.include_router(projects_router, prefix=settings.api_prefix)
-app.include_router(test_router, prefix=settings.api_prefix)
-app.include_router(step_router, prefix=settings.api_prefix)
-app.include_router(testcase_router, prefix=settings.api_prefix)
-app.include_router(file_router, prefix=settings.api_prefix)
-app.include_router(analytics_router, prefix=settings.api_prefix)
-app.include_router(p_router, prefix=settings.api_prefix)
-app.include_router(program_a_router, prefix=settings.api_prefix)
-app.include_router(testcase_analytics_router, prefix=settings.api_prefix)
+app.include_router(user_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(portfolio_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(program_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(projects_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(test_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(step_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(testcase_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(file_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(analytics_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(p_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(program_a_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(testcase_analytics_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(auth_router, prefix=settings.api_prefix)
 install_debug_handlers(app)
 
 

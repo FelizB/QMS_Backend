@@ -8,7 +8,7 @@ from app.application.use_cases.testcases.testcase_usecase import (
     SoftDeleteTestCase, MoveTestCase, CountTestCases, SearchTestCases, ListProjectTestCases
 )
 from app.core.db import get_session
-from app.presentation.dependencies.current_user import CurrentUser as get_current_user  # your auth
+from app.presentation.dependencies.auth import get_current_user  # your auth
 from app.presentation.schemas.testcase_schema import (
     TestCaseCreate, TestCaseUpdate, TestCaseOut, PagedResult, CountOut
 )

@@ -6,6 +6,7 @@ from typing import Optional
 import sqlalchemy as sa
 from sqlalchemy import String, Integer, Boolean, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.sql.schema import UniqueConstraint
 
 from .base import Base
 
@@ -22,12 +23,14 @@ class User(Base):
 
     # flags
     admin: Mapped[bool] = mapped_column(Boolean, name="Admin", nullable=False, server_default=sa.sql.false())
+    superuser: Mapped[bool] = mapped_column(Boolean, name="Superuser", nullable=False, server_default=sa.sql.false())
     active: Mapped[bool] = mapped_column(Boolean, name="Active", nullable=False, server_default=sa.sql.true())
     approved: Mapped[bool] = mapped_column(Boolean, name="Approved", nullable=False, server_default=sa.sql.false())
     locked: Mapped[bool] = mapped_column(Boolean, name="Locked", nullable=False, server_default=sa.sql.false())
 
     # org info
     department: Mapped[str] = mapped_column(String(255), name="Department", nullable=False)
+    role: Mapped[str] = mapped_column(String(255), name="Role", nullable=False)
     unit: Mapped[str] = mapped_column(
         String(255), name="Unit", nullable=False
     )
@@ -74,4 +77,9 @@ class User(Base):
         DateTime(timezone=True),
         name="deleted_at",
         nullable=True,
+    )
+
+    __table_args__ = (
+        UniqueConstraint("Email", name="uq_users_email"),
+        UniqueConstraint("Username", name="uq_users_username"),
     )

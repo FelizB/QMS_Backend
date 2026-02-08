@@ -5,16 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="Added analytics APIs for portfolio and projects">
-      <change afterPath="$PROJECT_DIR$/app/application/services/case_rules.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/testcase_analytics_usecase.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/testcase_analytics_repository_sqlalchemy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/testcase_next_analytics_repository_sqlalchemy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/testcase_analytics_route.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/testcase_analytics_schema.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/core/security.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/auth_routes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/dependencies/auth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/auth_schema.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/testcase_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/testcase_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/teststep_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/teststep_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/testcase_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/testcase_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/user_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/dependencies/current_user.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -204,7 +209,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770127732623</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Added analytics APIs for portfolio and projects">
+      <option name="closed" value="true" />
+      <created>1770554440856</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1770554440856</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="UnknownFeatures">

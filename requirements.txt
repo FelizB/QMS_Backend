@@ -11,3 +11,4 @@ pydantic
 pydantic-settings
 passlib
 python-multipart
+python-jose[cryptography]

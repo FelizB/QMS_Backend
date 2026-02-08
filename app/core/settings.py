@@ -21,6 +21,16 @@ class Settings(BaseSettings):
     api_prefix: str = "/api/v1"
     log_level: str = "INFO"
 
+    # Auth
+    ENFORCE_AUTH: bool = True  # flip to True to require auth globally on /api/v1/*
+    JWT_SECRET_KEY: str = "CHANGE_ME_32+_CHARS"  # Use a long random value in prod
+    JWT_REFRESH_SECRET_KEY: str = "CHANGE_ME_REFRESH_32+_CHARS"
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    JWT_LEEWAY_SECONDS: int = 60
+
+    # File upload
     FILES_STORAGE_BACKEND: str = "local"  # or "s3"
     FILES_LOCAL_ROOT: str = "/data/uploads"  # mount a Docker volume here
     MAX_UPLOAD_MB: int = 20
