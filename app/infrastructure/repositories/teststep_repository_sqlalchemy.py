@@ -1,9 +1,13 @@
 from typing import Optional, List, Iterable
 
+from fastapi import HTTPException, status
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.infrastructure.models.lookup_model import TestStepStatusLkp as R_ExecutionStatus
 from app.infrastructure.models.testcase_model import TestStep
+
+DEFAULT_EXEC_STATUS_CODE = "NOT_RUN"
 
 
 class TestStepRepository:
@@ -24,21 +28,50 @@ class TestStepRepository:
         max_seq = res.scalar_one()
         return int(max_seq) + 1
 
-    async def create(self, test_case_id: int, action: str, expected_result: Optional[str] = None,
-                     sequence: Optional[int] = None) -> TestStep:
-        if sequence is None:
-            sequence = await self._next_sequence(test_case_id)
-
-        obj = TestStep(
-            test_case_id=test_case_id,
-            action=action,
-            expected_result=expected_result,
-            sequence=sequence,
+    async def _get_default_status_id(self) -> int:
+        # Resolve default by code so it works across environments
+        res = await self.session.execute(
+            select(R_ExecutionStatus.id).where(R_ExecutionStatus.code == DEFAULT_EXEC_STATUS_CODE)
         )
-        self.session.add(obj)
-        await self.session.commit()
-        await self.session.refresh(obj)
-        return obj
+        status_id = res.scalar_one_or_none()
+        if status_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Default execution status '{DEFAULT_EXEC_STATUS_CODE}' not found. Seed your lookups."
+            )
+        return status_id
+
+    async def create(self, payload) -> TestStep:
+        # if missing, default
+        status_id = payload.test_step_status_id
+        if status_id is None:
+            status_id = await self._get_default_status_id()
+
+        # Validate the referenced status exists (defensive)
+        valid = await self.session.scalar(
+            select(R_ExecutionStatus.id).where(R_ExecutionStatus.id == status_id)
+        )
+        if valid is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid test_step_status_id={status_id}"
+            )
+
+        entity = TestStep(
+            test_case_id=payload.test_case_id,
+            sequence=payload.sequence,
+            action=payload.action,
+            expected_result=payload.expected_result,
+            test_step_status_id=status_id,
+        )
+        self.session.add(entity)
+        try:
+            await self.session.commit()
+        except Exception:
+            await self.session.rollback()
+            raise
+        await self.session.refresh(entity)
+        return entity
 
     async def bulk_create(self, steps: Iterable[dict]) -> List[TestStep]:
         created = []

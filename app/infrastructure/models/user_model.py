@@ -27,6 +27,7 @@ class User(Base):
     active: Mapped[bool] = mapped_column(Boolean, name="Active", nullable=False, server_default=sa.sql.true())
     approved: Mapped[bool] = mapped_column(Boolean, name="Approved", nullable=False, server_default=sa.sql.false())
     locked: Mapped[bool] = mapped_column(Boolean, name="Locked", nullable=False, server_default=sa.sql.false())
+    token_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
 
     # org info
     department: Mapped[str] = mapped_column(String(255), name="Department", nullable=False)

@@ -23,3 +23,18 @@ class UserOut(BaseModel):
     username: str
     active: bool
     superuser: bool
+    admin: bool
+    approved: bool
+    locked: bool
+    department: str
+    role: str
+    unit: str
+    first_name: str
+    middle_name: str
+    last_name: str
+
+
+class LogoutOut(BaseModel):
+    code: str
+    message: str
+    details: str | None = None

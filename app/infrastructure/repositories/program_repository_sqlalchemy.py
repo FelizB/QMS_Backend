@@ -1,3 +1,4 @@
+import datetime
 from typing import Sequence, Optional
 
 from fastapi import HTTPException
@@ -78,6 +79,7 @@ class ProgramRepository:
             .returning(Program)
             .values(is_active=False)
             .values(is_deleted=True)
+            .values(deleted_at=datetime.datetime.now())
             .returning(Program)
         )
         res = await self.session.execute(stmt)

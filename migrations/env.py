@@ -40,7 +40,7 @@ if db_url:
 from app.infrastructure.models.base import Base
 # Import each model module so tables register on Base.metadata
 from app.infrastructure.models import user_model, project_model, portfolio_model, program_model, \
-    testcase_model, file_attachment_model, lookup_model
+    testcase_model, file_attachment_model, lookup_model, token_blacklist
 
 target_metadata = Base.metadata
 
@@ -56,6 +56,10 @@ def include_object(obj, name, type_, reflected, compare_to):
     Skip objects that explicitly opt out via info={"alembic_autogenerate": False},
     and skip known partial indexes by name (Postgres partial unique indexes).
     """
+
+    if type_ == "table" and reflected and compare_to is None:
+        return False
+
     try:
         if getattr(obj, "info", None) and obj.info.get("alembic_autogenerate") is False:
             return False

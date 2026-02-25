@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Optional, Sequence
 
 from sqlalchemy import select, update
@@ -114,3 +115,14 @@ class SQLAlchemyUserRepository(IUserRepository):
 
         # 4) Reload & return the fully populated entity
         return row
+
+    async def bump_token_version(self, user_id: int):
+        stmt = (
+            update(UserModel)
+            .where(UserModel.id == user_id)
+            .values(
+                token_version=UserModel.token_version + 1,
+                updated_at=datetime.now(timezone.utc)
+            )
+        )
+        await self.session.execute(stmt)

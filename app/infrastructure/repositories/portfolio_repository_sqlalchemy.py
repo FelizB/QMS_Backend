@@ -1,3 +1,4 @@
+import datetime
 from typing import Tuple, List, Optional
 
 from fastapi import HTTPException
@@ -85,6 +86,7 @@ class PortfolioRepository:
             .where(Portfolio.is_deleted.is_(False))
             .values(is_deleted=True)
             .values(is_active=False)
+            .values(deleted_at=datetime.datetime.now())
             .returning(Portfolio)
         )
         res = await self.session.execute(stmt)

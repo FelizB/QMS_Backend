@@ -21,12 +21,7 @@ class CreateTestStepUseCase:
         if not case or getattr(case, "is_deleted", False):
             raise HTTPException(status_code=404, detail=f"Test case {payload.test_case_id} not found")
 
-        obj = await self.steps_repo.create(
-            test_case_id=payload.test_case_id,
-            action=payload.action,
-            expected_result=payload.expected_result,
-            sequence=payload.sequence,
-        )
+        obj = await self.steps_repo.create(payload)
         return TestStepOut.model_validate(obj, from_attributes=True)
 
 

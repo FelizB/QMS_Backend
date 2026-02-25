@@ -93,6 +93,46 @@ class CreateUserUseCase:
         # Create via repository (commits inside)
         try:
             return await self.repo.create(user_model)
-        except IntegrityError:
-            # Unique (email/username) conflicts or races → return consistent 409
-            raise HTTPException(status_code=HTTP_409_CONFLICT, detail="Username or email already registered")
+
+        except IntegrityError as e:
+            # SQLAlchemy context
+            stmt = getattr(e, 'statement', None)
+            params = getattr(e, 'params', None)
+
+            # DBAPI (psycopg2) exception
+            orig = getattr(e, 'orig', None)
+            pgcode = getattr(orig, 'pgcode', None)  # e.g., '23505' for unique_violation
+            diag = getattr(orig, 'diag', None)  # Diagnostic object (may be None)
+
+            constraint = getattr(diag, 'constraint_name', None)
+            schema = getattr(diag, 'schema_name', None)
+            table = getattr(diag, 'table_name', None)
+            column = getattr(diag, 'column_name', None)
+            detail = getattr(diag, 'detail', None)  # often very helpful
+            message_primary = getattr(diag, 'message_primary', None)  # main message
+
+            # Log everything for debugging
+            # (Use your logger, avoid printing in prod)
+            print("SQLALCHEMY STMT:", stmt)
+            print("PARAMS:", params)
+            print("PGCODE:", pgcode)
+            print("DIAG:", {
+                "message_primary": message_primary,
+                "detail": detail,
+                "schema": schema,
+                "table": table,
+                "column": column,
+                "constraint": constraint,
+            })
+
+            # Optionally, map specific codes to friendly messages
+            if pgcode == '23505':  # unique_violation
+                raise HTTPException(status_code=409, detail=f"Unique violation on {constraint or table}")
+            elif pgcode == '23502':  # not_null_violation
+                raise HTTPException(status_code=400, detail=f"NULL in NOT NULL column: {column}")
+            elif pgcode == '23503':  # foreign_key_violation
+                raise HTTPException(status_code=400, detail=f"Foreign key violation on {constraint}")
+            else:
+                # Re-raise or wrap with raw message for dev
+                # Unique (email/username) conflicts or races → return consistent 409
+                raise HTTPException(status_code=HTTP_409_CONFLICT, detail="Username or email already registered")

@@ -15,6 +15,17 @@ class TestCaseStatusLkp(Base):
     external_key: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
 
+class TestStepStatusLkp(Base):
+    __tablename__ = "test_step_statuses"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    name: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)  # e.g., "draft"
+    display_name: Mapped[str] = mapped_column(String(150), nullable=False)  # e.g., "Draft"
+    sort_order: Mapped[int] = mapped_column(Integer, nullable=False, default=100)
+    color_hex: Mapped[str] = mapped_column(String(7), nullable=True)  # "#RRGGBB"
+    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    external_key: Mapped[str | None] = mapped_column(String(100), nullable=True)
+
+
 class PriorityLkp(Base):
     __tablename__ = "priorities"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)

@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, JSONResponse
 from starlette.status import HTTP_409_CONFLICT, HTTP_400_BAD_REQUEST, HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -76,3 +77,19 @@ async def domain_error_handler(request: Request, exc: DomainError):
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError):
     return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"detail": str(exc)})
+
+
+origins = [
+    "http://localhost:5173",  # Vite dev server
+    # add "http://127.0.0.1:5173" too if you sometimes use 127.0.0.1
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,  # keep False unless you truly use cookies/auth with credentials
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["*"],  # or enumerate: ["Authorization", "Content-Type", ...]
+    expose_headers=[],
+    max_age=3600,  # cache preflight (optional)
+)

@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from dotenv import load_dotenv
 from passlib.context import CryptContext
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -30,6 +32,11 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     JWT_LEEWAY_SECONDS: int = 60
 
+    REFRESH_COOKIE_NAME: str = "refresh_token"
+    REFRESH_COOKIE_SECURE: bool = True
+    REFRESH_COOKIE_HTTPONLY: bool = True
+    REFRESH_COOKIE_SAMESITE: str = "strict"
+
     # File upload
     FILES_STORAGE_BACKEND: str = "local"  # or "s3"
     FILES_LOCAL_ROOT: str = "/data/uploads"  # mount a Docker volume here
@@ -52,3 +59,6 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 
 settings = Settings()
+
+ACCESS_TTL = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+REFRESH_TTL = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)

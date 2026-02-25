@@ -12,7 +12,7 @@ from app.presentation.schemas.teststep_schema import (
     TestStepCreate, TestStepUpdate, TestStepOut, TestStepReorderIn
 )
 
-step_router = APIRouter(prefix="/api/v1/teststeps", tags=["teststeps"])
+step_router = APIRouter(prefix="/teststeps", tags=["teststeps"])
 
 
 def get_repos(session: AsyncSession = Depends(get_session)):
