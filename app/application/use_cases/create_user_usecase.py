@@ -66,7 +66,8 @@ class CreateUserUseCase:
         middle_name = _norm(payload.middle_name)
         last_name = _norm(payload.last_name)
         rss_token = _norm(payload.rss_token)
-
+        gender = _norm(payload.gender)
+        birthday = _norm(payload.birthday)
         # ✅ Normalize new scalar fields
         phone = _norm(getattr(payload, "phone", None))
         site = _norm(getattr(payload, "site", None))
@@ -132,8 +133,8 @@ class CreateUserUseCase:
             middle_name=middle_name,
             last_name=last_name,
             rss_token=rss_token,
-
-            # ✅ New fields
+            gender=gender,
+            birthday=birthday,
             phone=phone,
             site=site,
             address=address,

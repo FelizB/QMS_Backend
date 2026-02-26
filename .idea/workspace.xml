@@ -5,8 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="updated auth functionalities">
-      <change afterPath="$PROJECT_DIR$/app/domain/utils/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/domain/utils/initials.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" afterDir="false" />
@@ -225,7 +223,15 @@
       <option name="project" value="LOCAL" />
       <updated>1771980710857</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="updated auth functionalities">
+      <option name="closed" value="true" />
+      <created>1772124541831</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1772124541831</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="UnknownFeatures">

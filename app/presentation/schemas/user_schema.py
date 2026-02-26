@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional, Dict, List
 
 from pydantic import EmailStr, Field
@@ -25,6 +25,8 @@ class UserBase(CamelModel):
     first_name: str
     middle_name: Optional[str] = None
     last_name: str
+    gender: Optional[str] = None
+    birthday: date | None = None
     rss_token: Optional[str] = None
     admin: bool = False  # default server-side too
     superuser: bool = False

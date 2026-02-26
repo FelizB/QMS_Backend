@@ -1,3 +1,4 @@
+from datetime import datetime, date
 from typing import Optional, List, Dict, Any
 
 from pydantic import BaseModel, EmailStr, Field
@@ -45,7 +46,8 @@ class UserOut(BaseModel):
     last_name: Optional[str] = None
     initials: str
     initials_colors: str
-
+    gender: str
+    birthday: date | None = None
     phone: Optional[str] = None
     site: Optional[str] = None
     address: Optional[str] = None

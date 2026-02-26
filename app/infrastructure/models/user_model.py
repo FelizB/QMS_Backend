@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, date
 from typing import Optional, List, Dict
 
 import sqlalchemy as sa
-from sqlalchemy import String, Integer, Boolean, DateTime, text
+from sqlalchemy import String, Integer, Boolean, DateTime, text, Date
 from sqlalchemy.dialects.postgresql.json import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql.schema import UniqueConstraint
@@ -39,6 +39,10 @@ class User(Base):
     first_name: Mapped[str] = mapped_column(String(255), name="FirstName", nullable=False)
     middle_name: Mapped[Optional[str]] = mapped_column(String(255), name="MiddleName", nullable=True)
     last_name: Mapped[str] = mapped_column(String(255), name="LastName", nullable=False)
+
+    gender: Mapped[Optional[str]] = mapped_column("gender", String(16), nullable=True)
+    birthday: Mapped[date | None] = mapped_column(Date, nullable=True)
+
     # tokens
     rss_token: Mapped[Optional[str]] = mapped_column(String(255), name="RssToken", nullable=True)
     # audit
