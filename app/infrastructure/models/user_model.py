@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List, Dict
 
 import sqlalchemy as sa
-from sqlalchemy import String, Integer, Boolean, DateTime
+from sqlalchemy import String, Integer, Boolean, DateTime, text
+from sqlalchemy.dialects.postgresql.json import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql.schema import UniqueConstraint
 
@@ -18,6 +19,8 @@ class User(Base):
 
     # credentials / identity
     username: Mapped[str] = mapped_column(String(128), name="Username", unique=True, nullable=False)
+    initials: Mapped[str] = mapped_column(String(2), name="Initials", unique=True, nullable=False)
+    initials_colors = mapped_column(String(128), name="Initials_colors", unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String(255), name="Email", unique=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
 
@@ -32,53 +35,33 @@ class User(Base):
     # org info
     department: Mapped[str] = mapped_column(String(255), name="Department", nullable=False)
     role: Mapped[str] = mapped_column(String(255), name="Role", nullable=False)
-    unit: Mapped[str] = mapped_column(
-        String(255), name="Unit", nullable=False
-    )
-
-    # names
-    first_name: Mapped[str] = mapped_column(
-        String(255), name="FirstName", nullable=False
-    )
-    middle_name: Mapped[Optional[str]] = mapped_column(
-        String(255), name="MiddleName", nullable=True
-    )
-    last_name: Mapped[str] = mapped_column(
-        String(255), name="LastName", nullable=False
-    )
-
+    unit: Mapped[str] = mapped_column(String(255), name="Unit", nullable=False)
+    first_name: Mapped[str] = mapped_column(String(255), name="FirstName", nullable=False)
+    middle_name: Mapped[Optional[str]] = mapped_column(String(255), name="MiddleName", nullable=True)
+    last_name: Mapped[str] = mapped_column(String(255), name="LastName", nullable=False)
     # tokens
-    rss_token: Mapped[Optional[str]] = mapped_column(
-        String(255), name="RssToken", nullable=True
-    )
-
+    rss_token: Mapped[Optional[str]] = mapped_column(String(255), name="RssToken", nullable=True)
     # audit
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        name="created_at",
-        nullable=False,
-        server_default=sa.func.now(),
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        name="updated_at",
-        nullable=False,
-        server_default=sa.func.now(),
-        onupdate=sa.func.now(),
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), name="created_at", nullable=False,
+                                                 server_default=sa.func.now(), )
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), name="updated_at", nullable=False,
+                                                 server_default=sa.func.now(), onupdate=sa.func.now(), )
 
     # soft delete
-    is_deleted: Mapped[bool] = mapped_column(
-        Boolean,
-        name="is_deleted",
-        nullable=False,
-        server_default=sa.sql.false(),
-    )
-    deleted_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime(timezone=True),
-        name="deleted_at",
-        nullable=True,
-    )
+    is_deleted: Mapped[bool] = mapped_column(Boolean, name="is_deleted", nullable=False,
+                                             server_default=sa.sql.false(), )
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), name="deleted_at", nullable=True, )
+
+    phone: Mapped[Optional[str]] = mapped_column(String(32), unique=True, nullable=True)
+    site: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    address: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    country: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    skills: Mapped[List[str]] = mapped_column(JSONB, nullable=False, server_default=text("'[]'::jsonb"), )
+    primary_worksite_info: Mapped[Dict[str, object]] = mapped_column(JSONB, nullable=False,
+                                                                     server_default=text("'{}'::jsonb"), )
+    secondary_worksite_info: Mapped[Dict[str, object]] = mapped_column(JSONB, nullable=False,
+                                                                       server_default=text("'{}'::jsonb"), )
 
     __table_args__ = (
         UniqueConstraint("Email", name="uq_users_email"),

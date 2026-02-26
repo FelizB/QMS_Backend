@@ -4,28 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="Added authorization">
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/models/token_blacklist.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/TokenBlacklistRepository.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/saveactions_settings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/saveactions_settings.xml" afterDir="false" />
+    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="updated auth functionalities">
+      <change afterPath="$PROJECT_DIR$/app/domain/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/domain/utils/initials.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/teststeps/teststep_usecases.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/teststeps/teststep_usecases.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/core/security.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/security.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/core/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/lookup_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/lookup_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/testcase_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/testcase_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/portfolio_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/portfolio_repository_sqlalchemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/program_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/program_repository_sqlalchemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/teststep_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/teststep_repository_sqlalchemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/user_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/user_repository_sqlalchemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/auth_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/auth_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/teststep_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/teststep_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/dependencies/auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/dependencies/auth.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/presentation/schemas/auth_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/auth_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/env.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -93,11 +79,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/domain/utils" />
       <recent name="$PROJECT_DIR$/app/application/use_cases/analytics" />
       <recent name="$PROJECT_DIR$/app/presentation/schemas" />
       <recent name="$PROJECT_DIR$/app/infrastructure/models" />
       <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/fastapi-backend" />
     </key>
   </component>
   <component name="RunManager" selected="Makefile Target.revision">
@@ -231,7 +217,15 @@
       <option name="project" value="LOCAL" />
       <updated>1770570160741</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="updated auth functionalities">
+      <option name="closed" value="true" />
+      <created>1771980710857</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1771980710857</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -260,7 +254,8 @@
     <MESSAGE value="Added Analytics APIs" />
     <MESSAGE value="Added analytics APIs for portfolio and projects" />
     <MESSAGE value="Added authorization" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added authorization" />
+    <MESSAGE value="updated auth functionalities" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated auth functionalities" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

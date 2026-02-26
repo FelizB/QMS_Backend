@@ -1,16 +1,38 @@
-from typing import Optional
+from typing import Optional, Any, Dict, List
 
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_409_CONFLICT
 
 from app.core.security import get_password_hash
+from app.domain.utils.initials import generate_initials_and_colors
 from app.infrastructure.models.user_model import User as UserModel  # adjust import path if needed
 from app.infrastructure.repositories.user_repository_sqlalchemy import SQLAlchemyUserRepository  # or your concrete repo
 
 
 def _norm(s: Optional[str]) -> Optional[str]:
-    return s.strip() if isinstance(s, str) else s
+    """Trim string; keep None for non-strings or empty after trim."""
+    if isinstance(s, str):
+        s2 = s.strip()
+        return s2 if s2 != "" else None
+    return s
+
+
+def _list_str(v: Any) -> List[str]:
+    """Ensure a list[str] with trimmed, non-empty strings."""
+    if isinstance(v, list):
+        out: List[str] = []
+        for x in v:
+            sx = str(x).strip()
+            if sx:
+                out.append(sx)
+        return out
+    return []
+
+
+def _dict_obj(v: Any) -> Dict[str, Any]:
+    """Ensure a plain dict; otherwise {}."""
+    return v if isinstance(v, dict) else {}
 
 
 class CreateUserUseCase:
@@ -34,8 +56,8 @@ class CreateUserUseCase:
             current_is_superuser: bool,
             is_authenticated: bool,
     ) -> UserModel:
-        # Normalize
-        email = _norm(payload.email).lower()
+        # Normalize existing core fields
+        email = (_norm(payload.email) or "").lower()
         username = _norm(payload.username)
         department = _norm(payload.department)
         role = _norm(payload.role)
@@ -45,10 +67,23 @@ class CreateUserUseCase:
         last_name = _norm(payload.last_name)
         rss_token = _norm(payload.rss_token)
 
+        # ✅ Normalize new scalar fields
+        phone = _norm(getattr(payload, "phone", None))
+        site = _norm(getattr(payload, "site", None))
+        address = _norm(getattr(payload, "address", None))
+        country = _norm(getattr(payload, "country", None))
+        primary_worksite = _norm(getattr(payload, "primary_worksite", None))
+        secondary_worksite = _norm(getattr(payload, "secondary_worksite", None))
+
+        # ✅ Normalize new structured fields (safe defaults)
+        skills = _list_str(getattr(payload, "skills", None))  # list[str]
+        primary_worksite_info = _dict_obj(getattr(payload, "primary_worksite_info", None))  # dict
+        secondary_worksite_info = _dict_obj(getattr(payload, "secondary_worksite_info", None))  # dict
+
         # Decide flags
         if current_is_superuser:
-            admin_flag = bool(payload.admin)
-            superuser_flag = bool(payload.superuser)
+            admin_flag = bool(getattr(payload, "admin", False))
+            superuser_flag = bool(getattr(payload, "superuser", False))
             approved = True
             active = True
         elif current_is_admin:
@@ -67,14 +102,23 @@ class CreateUserUseCase:
             superuser_flag = False
             approved = False  # you can require manual approval
             active = True
-        locked = False
 
+        locked = False
         hashed = get_password_hash(payload.password)
 
-        # Build full ORM model instance
+        # Initials & colors
+        init, init_colors = generate_initials_and_colors(
+            payload.first_name,
+            payload.last_name,
+        )
+
+        # Build ORM model instance
+        # NOTE: JSONB columns are NOT NULL with server defaults—passing [] / {} is safe too.
         user_model = UserModel(
             email=email,
             username=username,
+            initials=init,
+            initials_colors=init_colors,
             hashed_password=hashed,
             admin=admin_flag,
             superuser=superuser_flag,
@@ -88,6 +132,17 @@ class CreateUserUseCase:
             middle_name=middle_name,
             last_name=last_name,
             rss_token=rss_token,
+
+            # ✅ New fields
+            phone=phone,
+            site=site,
+            address=address,
+            country=country,
+            primary_worksite=primary_worksite,
+            secondary_worksite=secondary_worksite,
+            skills=skills,  # JSONB []
+            primary_worksite_info=primary_worksite_info,  # JSONB {}
+            secondary_worksite_info=secondary_worksite_info,  # JSONB {}
         )
 
         # Create via repository (commits inside)
@@ -99,7 +154,7 @@ class CreateUserUseCase:
             stmt = getattr(e, 'statement', None)
             params = getattr(e, 'params', None)
 
-            # DBAPI (psycopg2) exception
+            # DBAPI (psycopg/asyncpg) exception
             orig = getattr(e, 'orig', None)
             pgcode = getattr(orig, 'pgcode', None)  # e.g., '23505' for unique_violation
             diag = getattr(orig, 'diag', None)  # Diagnostic object (may be None)
@@ -108,11 +163,10 @@ class CreateUserUseCase:
             schema = getattr(diag, 'schema_name', None)
             table = getattr(diag, 'table_name', None)
             column = getattr(diag, 'column_name', None)
-            detail = getattr(diag, 'detail', None)  # often very helpful
-            message_primary = getattr(diag, 'message_primary', None)  # main message
+            detail = getattr(diag, 'detail', None)
+            message_primary = getattr(diag, 'message_primary', None)
 
-            # Log everything for debugging
-            # (Use your logger, avoid printing in prod)
+            # Log (replace prints with your logger)
             print("SQLALCHEMY STMT:", stmt)
             print("PARAMS:", params)
             print("PGCODE:", pgcode)
@@ -125,14 +179,14 @@ class CreateUserUseCase:
                 "constraint": constraint,
             })
 
-            # Optionally, map specific codes to friendly messages
-            if pgcode == '23505':  # unique_violation
+            # Friendly messages
+            if pgcode == '23505':  # unique_violation (e.g., email or phone unique)
+                # You can branch by constraint to be more specific:
+                # if constraint == 'ix_users_phone_unique': ...
                 raise HTTPException(status_code=409, detail=f"Unique violation on {constraint or table}")
             elif pgcode == '23502':  # not_null_violation
                 raise HTTPException(status_code=400, detail=f"NULL in NOT NULL column: {column}")
             elif pgcode == '23503':  # foreign_key_violation
                 raise HTTPException(status_code=400, detail=f"Foreign key violation on {constraint}")
             else:
-                # Re-raise or wrap with raw message for dev
-                # Unique (email/username) conflicts or races → return consistent 409
                 raise HTTPException(status_code=HTTP_409_CONFLICT, detail="Username or email already registered")

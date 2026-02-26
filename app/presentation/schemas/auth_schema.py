@@ -1,3 +1,5 @@
+from typing import Optional, List, Dict, Any
+
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -17,6 +19,15 @@ class RefreshIn(BaseModel):
     refresh_token: str
 
 
+class WorksiteInfo(BaseModel):
+    code: Optional[str] = None
+    name: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    extra: Dict[str, Any] = Field(default_factory=dict)
+
+
 class UserOut(BaseModel):
     id: int
     email: EmailStr
@@ -26,12 +37,25 @@ class UserOut(BaseModel):
     admin: bool
     approved: bool
     locked: bool
-    department: str
-    role: str
-    unit: str
-    first_name: str
-    middle_name: str
-    last_name: str
+    department: Optional[str] = None
+    role: Optional[str] = None
+    unit: Optional[str] = None
+    first_name: Optional[str] = None
+    middle_name: Optional[str] = None
+    last_name: Optional[str] = None
+    initials: str
+    initials_colors: str
+
+    phone: Optional[str] = None
+    site: Optional[str] = None
+    address: Optional[str] = None
+    country: Optional[str] = None
+
+    skills: List[str] = Field(default_factory=list)
+    primary_worksite_info: WorksiteInfo = Field(default_factory=WorksiteInfo)
+    secondary_worksite_info: WorksiteInfo = Field(default_factory=WorksiteInfo)
+
+    model_config = {"from_attributes": True}
 
 
 class LogoutOut(BaseModel):

@@ -1,9 +1,19 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, List
 
 from pydantic import EmailStr, Field
 
-from .common import CamelModel
+from .common import CamelModel, BaseModel
+
+
+class WorksiteInfo(BaseModel):
+    # example shape; adjust keys as you wish
+    code: Optional[str] = None
+    name: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    country: Optional[str] = None
+    extra: Dict[str, object] = Field(default_factory=dict)
 
 
 class UserBase(CamelModel):
@@ -18,6 +28,13 @@ class UserBase(CamelModel):
     rss_token: Optional[str] = None
     admin: bool = False  # default server-side too
     superuser: bool = False
+    phone: Optional[str] = None
+    site: Optional[str] = None
+    address: Optional[str] = None
+    country: Optional[str] = None
+    skills: List[str] = Field(default_factory=list)
+    primary_worksite_info: WorksiteInfo = Field(default_factory=WorksiteInfo)
+    secondary_worksite_info: WorksiteInfo = Field(default_factory=WorksiteInfo)
 
 
 class UserCreate(UserBase):
@@ -66,6 +83,13 @@ class UserUpdate(CamelModel):
     middle_name: Optional[str] = None
     last_name: Optional[str] = None
     rss_token: Optional[str] = None
+    phone: Optional[str] = None
+    site: Optional[str] = None
+    address: Optional[str] = None
+    country: Optional[str] = None
+    skills: Optional[List[str]] = None
+    primary_worksite_info: Optional[WorksiteInfo] = None
+    secondary_worksite_info: Optional[WorksiteInfo] = None
 
 
 class UserDeleteResponse(CamelModel):
