@@ -60,8 +60,6 @@ class User(Base):
     site: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     address: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     country: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-
-    skills: Mapped[List[str]] = mapped_column(JSONB, nullable=False, server_default=text("'[]'::jsonb"), )
     primary_worksite_info: Mapped[Dict[str, object]] = mapped_column(JSONB, nullable=False,
                                                                      server_default=text("'{}'::jsonb"), )
     secondary_worksite_info: Mapped[Dict[str, object]] = mapped_column(JSONB, nullable=False,

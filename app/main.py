@@ -18,6 +18,7 @@ from app.presentation.controllers.testcase_routes import test_router
 from app.presentation.controllers.testcase_routes import testcase_router
 from app.presentation.controllers.teststep_routes import step_router
 from app.presentation.controllers.user_routes import user_router
+from app.presentation.controllers.user_skills import skills_router
 from app.presentation.debug_handlers import install_debug_handlers
 from app.presentation.dependencies.auth import get_current_user
 
@@ -34,6 +35,7 @@ app.include_router(analytics_router, prefix=settings.api_prefix, dependencies=[D
 app.include_router(p_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(program_a_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(testcase_analytics_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(skills_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(auth_router, prefix=settings.api_prefix)
 install_debug_handlers(app)
 

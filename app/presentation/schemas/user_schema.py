@@ -34,7 +34,6 @@ class UserBase(CamelModel):
     site: Optional[str] = None
     address: Optional[str] = None
     country: Optional[str] = None
-    skills: List[str] = Field(default_factory=list)
     primary_worksite_info: WorksiteInfo = Field(default_factory=WorksiteInfo)
     secondary_worksite_info: WorksiteInfo = Field(default_factory=WorksiteInfo)
 

@@ -56,7 +56,7 @@ class CreateUserUseCase:
             current_is_superuser: bool,
             is_authenticated: bool,
     ) -> UserModel:
-        # Normalize existing core fields
+
         email = (_norm(payload.email) or "").lower()
         username = _norm(payload.username)
         department = _norm(payload.department)
@@ -68,16 +68,13 @@ class CreateUserUseCase:
         rss_token = _norm(payload.rss_token)
         gender = _norm(payload.gender)
         birthday = _norm(payload.birthday)
-        # ✅ Normalize new scalar fields
+
         phone = _norm(getattr(payload, "phone", None))
         site = _norm(getattr(payload, "site", None))
         address = _norm(getattr(payload, "address", None))
         country = _norm(getattr(payload, "country", None))
         primary_worksite = _norm(getattr(payload, "primary_worksite", None))
         secondary_worksite = _norm(getattr(payload, "secondary_worksite", None))
-
-        # ✅ Normalize new structured fields (safe defaults)
-        skills = _list_str(getattr(payload, "skills", None))  # list[str]
         primary_worksite_info = _dict_obj(getattr(payload, "primary_worksite_info", None))  # dict
         secondary_worksite_info = _dict_obj(getattr(payload, "secondary_worksite_info", None))  # dict
 
@@ -141,7 +138,6 @@ class CreateUserUseCase:
             country=country,
             primary_worksite=primary_worksite,
             secondary_worksite=secondary_worksite,
-            skills=skills,  # JSONB []
             primary_worksite_info=primary_worksite_info,  # JSONB {}
             secondary_worksite_info=secondary_worksite_info,  # JSONB {}
         )
