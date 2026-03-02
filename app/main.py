@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, JSONResponse
+from sqlalchemy.exc import NoResultFound
 from starlette.status import HTTP_409_CONFLICT, HTTP_400_BAD_REQUEST, HTTP_422_UNPROCESSABLE_ENTITY
 
 from app.core.settings import settings
@@ -13,6 +14,7 @@ from app.presentation.controllers.portfolio_routes import portfolio_router
 from app.presentation.controllers.program_analytics_route import program_a_router
 from app.presentation.controllers.program_routes import program_router
 from app.presentation.controllers.project_routes import projects_router
+from app.presentation.controllers.tasks_routes import task_router
 from app.presentation.controllers.testcase_analytics_route import testcase_analytics_router
 from app.presentation.controllers.testcase_routes import test_router
 from app.presentation.controllers.testcase_routes import testcase_router
@@ -36,6 +38,7 @@ app.include_router(p_router, prefix=settings.api_prefix, dependencies=[Depends(g
 app.include_router(program_a_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(testcase_analytics_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(skills_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(task_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(auth_router, prefix=settings.api_prefix)
 install_debug_handlers(app)
 
@@ -79,6 +82,15 @@ async def domain_error_handler(request: Request, exc: DomainError):
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError):
     return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"detail": str(exc)})
+
+
+@app.exception_handler(NoResultFound)
+async def handle_no_result_found(request: Request, exc: NoResultFound):
+    #  consistent 404 with your message
+    return JSONResponse(
+        status_code=404,
+        content={"detail": str(exc) or "Resource not found"},
+    )
 
 
 origins = [

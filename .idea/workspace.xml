@@ -4,16 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="updated auth functionalities">
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/models/user_skills.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/user_skills.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/user_skills.py" afterDir="false" />
+    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="added skills api">
+      <change afterPath="$PROJECT_DIR$/app/application/services/tasks_service.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/domain/enum.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/models/tasks_model.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/tasks_repository_sqlalchemy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/tasks_routes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/tasks_schema.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/auth_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/auth_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/migrations/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/env.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -244,7 +243,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772140929469</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="added skills api">
+      <option name="closed" value="true" />
+      <created>1772311579200</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1772311579200</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -274,7 +281,8 @@
     <MESSAGE value="Added analytics APIs for portfolio and projects" />
     <MESSAGE value="Added authorization" />
     <MESSAGE value="updated auth functionalities" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated auth functionalities" />
+    <MESSAGE value="added skills api" />
+    <option name="LAST_COMMIT_MESSAGE" value="added skills api" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
