@@ -1,7 +1,6 @@
 # app/schemas/analytics.py
 from datetime import date, datetime
-from typing import Dict, List, Optional
-
+from typing import Dict, List, Optional, Literal
 from pydantic import BaseModel, Field
 
 
@@ -121,3 +120,75 @@ class TestCaseBreakdownLabeledOut(BaseModel):
     include_deleted: bool = False
     by_priority: list[LabeledCount] = Field(default_factory=list)
     by_type: list[LabeledCount] = Field(default_factory=list)
+
+
+class MonthlyCreationItem(BaseModel):
+    month: str = Field(..., description="YYYY-MM (first day of month)")
+    portfolios: int
+    programs: int
+    projects: int
+
+
+class MonthlyCreationsOut(BaseModel):
+    year: int
+    items: List[MonthlyCreationItem]
+
+
+class PeriodOut(BaseModel):
+    current_month_start: date
+    previous_month_start: date
+
+
+class PeriodOut(BaseModel):
+    current_month_start: date
+    previous_month_start: date
+
+
+Trend = Literal['up', 'down', 'flat']
+
+
+class EntitySummaryOut(BaseModel):
+    total_active: int = Field(..., description="Active rows total")
+    current_month: int = Field(..., description="Creations this month")
+    previous_month: int = Field(..., description="Creations last month")
+    change_pct: Optional[float] = Field(
+        None,
+        description="Percent change vs previous month; None when prev==0 and curr>0"
+    )
+    trend: Trend = Field(..., description="Direction of change: up | down | flat")
+    change_label: str = Field(
+        ..., description='Display label e.g. "NEW", "+25.0%", "-100.0%", "0%"'
+    )
+
+
+class DashboardSummaryOut(BaseModel):
+    as_of: datetime
+    period: PeriodOut
+    portfolios: EntitySummaryOut
+    programs: EntitySummaryOut
+    projects: EntitySummaryOut
+    users: EntitySummaryOut
+
+
+class StatusCountItem(BaseModel):
+    status: Optional[str]  # in case some rows have NULL
+    count: int
+
+
+class ProjectStatusCountsOut(BaseModel):
+    total: int
+    items: List[StatusCountItem]
+
+
+class ProjectsMonthlyItem(BaseModel):
+    month: int = Field(..., ge=1, le=12)
+    month_label: str
+    created: int = Field(..., ge=0)
+    active_of_created: int = Field(..., ge=0)
+
+
+class ProjectsMonthlyOut(BaseModel):
+    year: int
+    items: List[ProjectsMonthlyItem]
+    total_created: int
+    total_active_of_created: int

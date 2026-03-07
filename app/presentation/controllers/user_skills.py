@@ -10,7 +10,7 @@ from app.infrastructure.models.user_skills import UserSkill
 from app.infrastructure.models.user_model import User  # <-- import your User model
 from app.core.db import get_session
 
-skills_router = APIRouter(prefix="/users/{user_id}/skills", tags=["users-skills"])
+skills_router = APIRouter(prefix="/users/{user_id}/skills", tags=["users_skills"])
 
 
 async def get_user_or_404(user_id: int, db: AsyncSession) -> User:

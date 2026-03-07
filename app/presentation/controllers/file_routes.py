@@ -1,6 +1,5 @@
 import mimetypes
 from pathlib import Path as path
-
 from fastapi import APIRouter, Path, Query, Depends, UploadFile, File, Form, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import StreamingResponse
@@ -112,12 +111,12 @@ async def download_file(
     if obj.storage_backend != "local":
         raise HTTPException(status_code=HTTP_400_BAD_REQUEST, detail="Unsupported backend for direct download")
 
-    path = path(obj.storage_path)
+    Path = path(obj.storage_path)
     if not path.exists():
         raise HTTPException(status_code=HTTP_404_NOT_FOUND, detail="File missing")
 
     def iterfile():
-        with path.open("rb") as f:
+        with Path.open("rb") as f:
             while chunk := f.read(1024 * 1024):
                 yield chunk
 
@@ -128,7 +127,7 @@ async def download_file(
     return StreamingResponse(iterfile(), media_type=media_type, headers=headers)
 
 
-@file_router.delete("/{file_id}", summary="Soft-delete a file", status_code=204)
+@file_router.delete("/{file_id}", summary="Soft delete a file", status_code=204)
 async def delete_file(
         project_id: int = Path(..., gt=0),
         file_id: int = Path(..., gt=0),

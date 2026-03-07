@@ -43,6 +43,7 @@ class ProgramOut(ProgramBase):
     id: int
     guid: UUID
     concurrency_guid: UUID
+    created_at: datetime
     last_updated_date: datetime
 
 

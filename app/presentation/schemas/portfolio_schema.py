@@ -15,6 +15,8 @@ class PortfolioBase(CamelModel):
     artifact_type_id: Optional[int] = None
     is_active: bool = True
     is_default: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    last_updated_date: datetime = Field(default_factory=datetime.utcnow)
     custom_properties: Optional[Dict[str, Any]] = {}
 
 
@@ -30,6 +32,7 @@ class PortfolioUpdate(CamelModel):
     artifact_type_id: Optional[int] = None
     is_active: Optional[bool] = None
     is_default: Optional[bool] = None
+    last_updated_date: Optional[datetime] = None
     custom_properties: Optional[Dict[str, Any]] = None
     # Optimistic concurrency
     concurrency_guid: UUID
@@ -43,6 +46,7 @@ class PortfolioOut(CamelModel):
     guid: UUID
     concurrency_guid: UUID
     last_updated_date: datetime
+    created_at: datetime
 
 
 class PortfolioPagedResult(CamelModel):

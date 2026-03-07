@@ -1,10 +1,14 @@
 from datetime import date, datetime
-from typing import Dict, List, Optional, Literal, Tuple
+from typing import Dict, List, Optional, Literal, Tuple, Type, Any
 
-from sqlalchemy import select, func, case, literal_column
+from sqlalchemy import select, func, case, literal_column, false, text
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.elements import and_
 
 from app.infrastructure.models.lookup_model import PriorityLkp, TestCaseTypeLkp
+from app.infrastructure.models.portfolio_model import Portfolio
+from app.infrastructure.models.program_model import Program
+from app.infrastructure.models.project_model import Project
 from app.infrastructure.models.testcase_model import TestCase, TestStep
 
 SECONDS_PER_DAY = 86400.0
@@ -13,6 +17,68 @@ SECONDS_PER_DAY = 86400.0
 class ProjectAnalyticsRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    async def _counts_by_month(
+            self,
+            model: Type,
+            created_attr: str,
+            start_date: date,
+            end_date: date,
+            include_deleted: bool,
+    ) -> Dict[date, int]:
+        """
+        Return {first_of_month_date: count} for creations within [start_date, end_date).
+        Uses Postgres date_trunc('month', created_at).
+        """
+        created_col = getattr(model, created_attr)
+
+        filters = [
+            created_col >= start_date,
+            created_col < end_date,
+        ]
+        if hasattr(model, "is_deleted") and not include_deleted:
+            filters.append(model.is_deleted == false())
+
+        month_label = func.date_trunc("month", created_col).label("mth")
+
+        stmt = (
+            select(month_label, func.count().label("cnt"))
+            .where(and_(*filters))
+            .group_by(month_label)
+            .order_by(month_label)
+        )
+
+        rows = (await self.session.execute(stmt)).all()
+        # date_trunc returns a timestamp (e.g., 2026-01-01 00:00:00)
+        out: Dict[date, int] = {}
+        for r in rows:
+            # r.mth is datetime; convert to date()
+            out[r.mth.date()] = int(r.cnt)
+        return out
+
+    async def monthly_portfolio_creations(
+            self, year: int, include_deleted: bool = False
+    ) -> Dict[date, int]:
+        start = date(year, 1, 1)
+        end = date(year + 1, 1, 1)
+        # Adjust created column name if your model differs
+        return await self._counts_by_month(Portfolio, "created_at", start, end, include_deleted)
+
+    async def monthly_program_creations(
+            self, year: int, include_deleted: bool = False
+    ) -> Dict[date, int]:
+        start = date(year, 1, 1)
+        end = date(year + 1, 1, 1)
+        return await self._counts_by_month(Program, "created_at", start, end, include_deleted)
+
+    async def monthly_project_creations(
+            self, year: int, include_deleted: bool = False
+    ) -> Dict[date, int]:
+        start = date(year, 1, 1)
+        end = date(year + 1, 1, 1)
+        # If your project table uses "creation_date" instead, change here:
+        # return await self._counts_by_month(Project, "creation_date", start, end, include_deleted)
+        return await self._counts_by_month(Project, "creation_date", start, end, include_deleted)
 
     async def test_case_summary(
             self,
@@ -500,3 +566,58 @@ class ProjectAnalyticsRepository:
 
         res = await self.session.execute(stmt)
         return [(tid, name, int(cnt), int(sort) if sort is not None else 9999) for (tid, name, cnt, sort) in res.all()]
+
+    async def counts_by_status(self) -> List[Tuple[Optional[str], int]]:
+        """
+        Returns list of (status, count), including NULL as a bucket if present.
+        """
+        stmt = (
+            select(Project.status, func.count().label("cnt"))
+            .group_by(Project.status)
+            .order_by(Project.status)
+        )
+        rows = (await self.session.execute(stmt)).all()
+        # rows is a list of Row objects with [status, cnt]
+        return [(r[0], int(r[1])) for r in rows]
+
+    async def total_projects(self) -> int:
+        stmt = select(func.count()).select_from(Project)
+        result = await self.session.execute(stmt)
+        return int(result.scalar_one())
+
+    async def get_projects_monthly(self, year: int) -> List[Dict[str, Any]]:
+        """
+        Returns 12 rows for the given year with `created` and `active_of_created` counts.
+        Assumes: projects.created_at timestamptz (or creation_date), is_active boolean, deleted_at nullable.
+        """
+        sql = text("""
+            WITH months AS (
+              SELECT generate_series(
+                date_trunc('year', make_date(:year, 1, 1))::timestamptz,
+                (date_trunc('year', make_date(:year, 1, 1))::timestamptz + interval '11 months'),
+                interval '1 month'
+              ) AS month_start
+            )
+            SELECT
+              EXTRACT(MONTH FROM m.month_start)::int AS month,
+              to_char(m.month_start, 'Mon')         AS month_label,
+              COALESCE(
+                COUNT(*) FILTER (
+                  WHERE p.project_id IS NOT NULL
+                ), 0
+              ) AS created,
+              COALESCE(
+                COUNT(*) FILTER (
+                  WHERE p.project_id IS NOT NULL AND p.is_active = TRUE
+                ), 0
+              ) AS active_of_created
+            FROM months m
+            LEFT JOIN projects p
+              ON p.deleted_at IS NULL
+             AND date_trunc('month', p.creation_date) = m.month_start
+            GROUP BY m.month_start
+            ORDER BY m.month_start;
+        """)
+
+        rows = (await self.session.execute(sql, {"year": year})).mappings().all()
+        return [dict(r) for r in rows]

@@ -36,6 +36,7 @@ class Program(Base):
 
     custom_properties: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB, nullable=True,
                                                                         server_default=sa.text("'{}'::jsonb"))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
 
     last_updated_date: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

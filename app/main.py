@@ -6,8 +6,10 @@ from starlette.status import HTTP_409_CONFLICT, HTTP_400_BAD_REQUEST, HTTP_422_U
 
 from app.core.settings import settings
 from app.domain.errors import OwnershipError, DomainError
+from app.presentation.controllers.Grouped_Analytics import group_router
 from app.presentation.controllers.analytics_router import analytics_router
 from app.presentation.controllers.auth_routes import auth_router
+from app.presentation.controllers.enum_routes import enums_router
 from app.presentation.controllers.file_routes import file_router
 from app.presentation.controllers.portfolio_analytics_route import p_router
 from app.presentation.controllers.portfolio_routes import portfolio_router
@@ -39,6 +41,8 @@ app.include_router(program_a_router, prefix=settings.api_prefix, dependencies=[D
 app.include_router(testcase_analytics_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(skills_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(task_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(group_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(enums_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(auth_router, prefix=settings.api_prefix)
 install_debug_handlers(app)
 

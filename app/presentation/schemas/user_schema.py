@@ -57,6 +57,8 @@ class UserOut(CamelModel):
 class UserSummary(CamelModel):
     id: int
     username: str
+    first_name: str
+    last_name: str
     email: EmailStr
     created_at: datetime
     updated_at: datetime

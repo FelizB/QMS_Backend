@@ -77,6 +77,8 @@ class ProjectSummary(BaseModel):
     name: str
     is_active: bool
     percent_complete: Optional[int] = None
+    creation_date: datetime
+    updated_date: datetime
 
 
 class ProjectSummaryDelete(CamelModel):

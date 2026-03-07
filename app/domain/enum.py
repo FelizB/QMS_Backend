@@ -19,3 +19,13 @@ class TaskStatus(str, Enum):
     IN_PROGRESS = "IN_PROGRESS"
     BLOCKED = "BLOCKED"
     DONE = "DONE"
+
+
+class ProjectStatus(str, Enum):
+    PLANNING = "PLANNING"
+    DESIGN = "DESIGN"
+    EXECUTION = "EXECUTION"
+    SIGN_OFF = "SIGN_OFF"
+    ON_HOLD = "ON_HOLD"
+    CANCELLED = "CANCELLED"
+    DONE = "DONE"

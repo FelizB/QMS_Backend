@@ -4,12 +4,14 @@ from typing import Optional, Literal, List
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.application.use_cases.analytics.analytics_service import ProjectAnalyticsService
+from app.application.services.analytics_service import AnalyticsService
+from app.application.use_cases.analytics.projects_analytics_service import ProjectAnalyticsService
 from app.core.db import get_session
 from app.infrastructure.repositories.analytics_repository_sqlalchemy import ProjectAnalyticsRepository
+from app.infrastructure.repositories.testcase_analytics_repository_sqlalchemy import AnalyticsRepository
 from app.presentation.schemas.analytics_schema import TestCaseSummaryOut, TestStepSummaryOut, TrendPointOut, \
     TestCaseBreakdownOut, CasesWithoutStepsOut, AgingMetricsOut, LongestCasesOut, ReleaseCoverageOut, PriorityHealthOut, \
-    TestCaseBreakdownLabeledOut, LabeledCount
+    TestCaseBreakdownLabeledOut, LabeledCount, ProjectStatusCountsOut, ProjectsMonthlyOut
 
 analytics_router = APIRouter(prefix="/analytics/projects", tags=["project analytics"])
 
@@ -194,3 +196,28 @@ async def get_test_case_breakdown_labeled(
         by_priority=pr_items,
         by_type=ty_items,
     )
+
+
+@analytics_router.get("/status-counts", response_model=ProjectStatusCountsOut, summary="Counts of projects by status")
+async def projects_status_counts(
+        session: AsyncSession = Depends(get_session),
+):
+    svc = ProjectAnalyticsService(ProjectAnalyticsRepository(session))
+    return await svc.get_status_counts()
+
+
+def get_analytics_service(session: AsyncSession = Depends(get_session)) -> AnalyticsService:
+    repo = ProjectAnalyticsRepository(session)
+    return AnalyticsService(repo)
+
+
+@analytics_router.get("/monthly", response_model=ProjectsMonthlyOut)
+async def get_projects_monthly(
+        year: int | None = Query(None, ge=2000, le=9999),
+        svc: AnalyticsService = Depends(get_analytics_service)
+):
+    """
+    Returns monthly counts for projects created and how many of those are active.
+    Defaults to current year if `year` is not provided.
+    """
+    return await svc.get_projects_monthly(year)

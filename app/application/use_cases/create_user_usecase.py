@@ -73,8 +73,6 @@ class CreateUserUseCase:
         site = _norm(getattr(payload, "site", None))
         address = _norm(getattr(payload, "address", None))
         country = _norm(getattr(payload, "country", None))
-        primary_worksite = _norm(getattr(payload, "primary_worksite", None))
-        secondary_worksite = _norm(getattr(payload, "secondary_worksite", None))
         primary_worksite_info = _dict_obj(getattr(payload, "primary_worksite_info", None))  # dict
         secondary_worksite_info = _dict_obj(getattr(payload, "secondary_worksite_info", None))  # dict
 
@@ -136,8 +134,6 @@ class CreateUserUseCase:
             site=site,
             address=address,
             country=country,
-            primary_worksite=primary_worksite,
-            secondary_worksite=secondary_worksite,
             primary_worksite_info=primary_worksite_info,  # JSONB {}
             secondary_worksite_info=secondary_worksite_info,  # JSONB {}
         )

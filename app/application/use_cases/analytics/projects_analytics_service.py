@@ -14,6 +14,9 @@ from app.presentation.schemas.analytics_schema import (
     ReleaseCoverageOut,
     ReleaseBucketOut,
     PriorityHealthOut,
+    TestCaseBreakdownLabeledOut,
+    ProjectStatusCountsOut,
+    StatusCountItem
 
 )
 from app.presentation.schemas.analytics_schema import TestCaseSummaryOut, TestStepSummaryOut, TrendPointOut
@@ -227,3 +230,11 @@ class ProjectAnalyticsService:
             by_priority=pr_items,
             by_type=ty_items
         )
+
+    async def get_status_counts(self) -> ProjectStatusCountsOut:
+        rows = await self.repo.counts_by_status()
+        total = await self.repo.total_projects()
+        items: List[StatusCountItem] = [
+            StatusCountItem(status=status, count=count) for status, count in rows
+        ]
+        return ProjectStatusCountsOut(total=total, items=items)
