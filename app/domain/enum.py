@@ -29,3 +29,19 @@ class ProjectStatus(str, Enum):
     ON_HOLD = "ON_HOLD"
     CANCELLED = "CANCELLED"
     DONE = "DONE"
+
+
+class EntityType(str, Enum):
+    USER = "user"
+    PORTFOLIO = "portfolio"
+    PROGRAM = "program"
+    PROJECT = "project"
+    TESTCASE = "testcase"
+    TESTSTEP = "teststep"
+
+
+class ActivityAction(str, Enum):
+    CREATED = "created"
+    UPDATED = "updated"
+    DELETED = "deleted"
+    EXECUTED = "executed"  # Optional if you track execution event

@@ -11,6 +11,15 @@ from app.infrastructure.models.program_model import Program
 from app.infrastructure.models.project_model import Project
 from app.infrastructure.models.testcase_model import TestCase, TestStep
 
+# app/infrastructure/repositories/projects_repo.py
+from sqlalchemy import select, func, desc, and_, literal, case
+from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, timedelta
+from typing import Any
+from app.infrastructure.models.activity_log import ActivityLog, EntityType, ActivityAction
+
+EXECUTED_STATUSES = {"PASSED", "FAILED", "BLOCKED", "SKIPPED"}  # TODO: align to your enums
+
 SECONDS_PER_DAY = 86400.0
 
 
@@ -621,3 +630,215 @@ class ProjectAnalyticsRepository:
 
         rows = (await self.session.execute(sql, {"year": year})).mappings().all()
         return [dict(r) for r in rows]
+
+    async def get_top_projects(
+            self,
+            limit: int = 4,
+            window_days: int = 7,
+            org_id: int | None = None,
+    ) -> list[dict[str, Any]]:
+        now = datetime.utcnow()
+        window_start = now - timedelta(days=window_days)
+        prev_start = window_start - timedelta(days=window_days)
+        prev_end = window_start
+
+        # ---- Resolve Project PK and name columns safely ----
+        # If your model uses 'project_id' instead of 'id', this will adapt.
+        pk_col = getattr(Project, "id", None) or getattr(Project, "project_id")
+        name_col = getattr(Project, "name", None) or getattr(Project, "project_name")
+
+        if pk_col is None or name_col is None:
+            raise RuntimeError(
+                "Project model must have either (id or project_id) and (name or project_name). "
+                "Please align the repository with your actual column names."
+            )
+
+        # ---- Filters ----
+        filters = []
+        # Soft-delete field might be 'is_deleted' or similar in your model; align if different.
+        if hasattr(Project, "is_deleted"):
+            filters.append(Project.is_deleted == False)
+        if org_id is not None and hasattr(Project, "org_id"):
+            filters.append(Project.org_id == org_id)
+
+        # ---- Base projects subquery: LABEL columns to standard names ----
+        projects_q = (
+            select(
+                pk_col.label("project_id"),
+                name_col.label("project_name"),
+            )
+            .where(and_(*filters)) if filters else select(
+                pk_col.label("project_id"),
+                name_col.label("project_name"),
+            )
+        ).subquery("p")
+
+        # ---- Test case stats per project ----
+        # If your TestCase model uses a different FK name than 'project_id', align below.
+        tc_filters = [getattr(TestCase, "is_deleted", literal_column("false")) == False]
+        tc_stats_q = (
+            select(
+                TestCase.project_id.label("project_id"),
+                func.count().label("total"),
+                func.sum(
+                    case(
+                        (TestCase.test_case_status.in_(list(EXECUTED_STATUSES)), 1),
+                        else_=0,
+                    )
+                ).label("executed"),
+            )
+            .where(and_(*tc_filters))
+            .group_by(TestCase.project_id)
+            .subquery("tc_stats")
+        )
+
+        # ---- Updates in current window from ActivityLog (entity_type=project) ----
+        upd_curr_q = (
+            select(
+                ActivityLog.entity_id.label("project_id"),
+                func.count().label("updates_in_window"),
+            )
+            .where(
+                and_(
+                    ActivityLog.entity_type == EntityType.PROJECT,
+                    ActivityLog.action.in_([ActivityAction.CREATED, ActivityAction.UPDATED]),
+                    ActivityLog.created_at >= window_start,
+                    (ActivityLog.org_id == org_id) if org_id is not None else literal_column("true"),
+                )
+            )
+            .group_by(ActivityLog.entity_id)
+            .subquery("upd_curr")
+        )
+
+        # ---- Execution increments (CURRENT and PREVIOUS windows)
+        # We map TESTCASE-level execution logs back to PROJECT via TestCase.project_id.
+        # If you do not log 'EXECUTED' events, you can skip these and derive trend differently.
+
+        # CURRENT window
+        exec_curr_q = (
+            select(
+                TestCase.project_id.label("project_id"),
+                func.count().label("exec_incr_curr"),
+            )
+            .select_from(ActivityLog)
+            .join(TestCase, TestCase.id == ActivityLog.entity_id)
+            .where(
+                and_(
+                    ActivityLog.entity_type == EntityType.TESTCASE,
+                    ActivityLog.action == ActivityAction.EXECUTED,
+                    ActivityLog.created_at >= window_start,
+                    (ActivityLog.org_id == org_id) if org_id is not None else literal_column("true"),
+                    getattr(TestCase, "is_deleted", literal_column("false")) == False,
+                )
+            )
+            .group_by(TestCase.project_id)
+            .subquery("exec_curr")
+        )
+
+        # PREVIOUS window
+        exec_prev_q = (
+            select(
+                TestCase.project_id.label("project_id"),
+                func.count().label("exec_incr_prev"),
+            )
+            .select_from(ActivityLog)
+            .join(TestCase, TestCase.id == ActivityLog.entity_id)
+            .where(
+                and_(
+                    ActivityLog.entity_type == EntityType.TESTCASE,
+                    ActivityLog.action == ActivityAction.EXECUTED,
+                    ActivityLog.created_at >= prev_start,
+                    ActivityLog.created_at < prev_end,
+                    (ActivityLog.org_id == org_id) if org_id is not None else literal_column("true"),
+                    getattr(TestCase, "is_deleted", literal_column("false")) == False,
+                )
+            )
+            .group_by(TestCase.project_id)
+            .subquery("exec_prev")
+        )
+
+        # ---- Compose final query ----
+        join_q = (
+            select(
+                projects_q.c.project_id,
+                projects_q.c.project_name,
+                func.coalesce(tc_stats_q.c.total, 0).label("testcases_total"),
+                func.coalesce(tc_stats_q.c.executed, 0).label("testcases_executed"),
+                func.coalesce(upd_curr_q.c.updates_in_window, 0).label("updates_in_window"),
+                func.coalesce(exec_curr_q.c.exec_incr_curr, 0).label("exec_incr_curr"),
+                func.coalesce(exec_prev_q.c.exec_incr_prev, 0).label("exec_incr_prev"),
+            )
+            .select_from(projects_q)
+            .join(tc_stats_q, tc_stats_q.c.project_id == projects_q.c.project_id, isouter=True)
+            .join(upd_curr_q, upd_curr_q.c.project_id == projects_q.c.project_id, isouter=True)
+            .join(exec_curr_q, exec_curr_q.c.project_id == projects_q.c.project_id, isouter=True)
+            .join(exec_prev_q, exec_prev_q.c.project_id == projects_q.c.project_id, isouter=True)
+            .order_by(desc("updates_in_window"), desc("testcases_executed"))
+            .limit(limit)
+        )
+
+        rows = (await self.session.execute(join_q)).mappings().all()
+
+        # ---- Compute progress + trend in Python ----
+        result: list[dict[str, Any]] = []
+        for r in rows:
+            total = int(r["testcases_total"])
+            executed = int(r["testcases_executed"])
+            progress_now = (executed * 100.0 / total) if total > 0 else 0.0
+
+            inc_curr = int(r["exec_incr_curr"])
+            inc_prev = int(r["exec_incr_prev"])
+            if inc_curr > inc_prev:
+                trend = "up"
+            elif inc_curr < inc_prev:
+                trend = "down"
+            else:
+                trend = "flat"
+
+            result.append({
+                "project_id": int(r["project_id"]),
+                "project_name": r["project_name"],
+                "testcases_total": total,
+                "testcases_executed": executed,
+                "progress_percent": round(progress_now, 1),
+                "trend": trend,
+                "updates_in_window": int(r["updates_in_window"]),
+            })
+        return result
+
+    async def get_recent_creations(
+            self,
+            limit: int = 5,
+            org_id: int | None = None,
+    ) -> list[dict]:
+        filters = [Project.is_deleted == False]
+        if org_id is not None:
+            filters.append(Project.org_id == org_id)
+
+        q = (
+            select(
+                Project.project_id,
+                Project.name,
+                Project.project_owner_name,
+                Project.creation_date,
+                Project.status,
+                # TODO: If you have relationship to owner user, join to get owner name.
+                # For now, assume denormalized owner_name on project (or null).
+                # If not present, join to users table and concat first/last names.
+                Project.project_owner_name,  # <-- add this column in your model or replace with join
+            )
+            .where(and_(*filters))
+            .order_by(desc(Project.creation_date))
+            .limit(limit)
+        )
+        rows = (await self.session.execute(q)).mappings().all()
+        return [
+            {
+                "id": int(r["project_id"]),
+                "name": r["name"],
+                "created_at": r["creation_date"],
+                "status": r["status"],
+                "owner_name": r.get("project_owner_name"),
+            }
+            for r in rows
+        ]

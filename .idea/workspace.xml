@@ -4,29 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="added tasks api">
-      <change afterPath="$PROJECT_DIR$/app/application/services/analytics_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/application/services/dashboard_service.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/dashboard_analytics_sqlalchemy.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/Grouped_Analytics.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/enum_routes.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/enums_schema.py" afterDir="false" />
+    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="added some analytics api">
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/models/activity_log.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/repositories/activity_log_repo_sqlalchemy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/analytics/analytics_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/analytics/projects_analytics_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/application/services/analytics_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/services/analytics_service.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/domain/enum.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/domain/enum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/portfolio_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/portfolio_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/program_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/program_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/project_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/project_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/testcase_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/testcase_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/analytics_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/analytics_repository_sqlalchemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/analytics_router.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/analytics_router.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/file_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/file_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/user_skills.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/user_skills.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/Grouped_Analytics.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/Grouped_Analytics.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/presentation/schemas/analytics_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/analytics_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/portfolio_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/portfolio_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/program_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/program_schema.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/presentation/schemas/project_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/project_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/env.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,29 +62,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Makefile Target.logs.executor": "Run",
-    "Makefile Target.revision.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHELLCHECK.PATH": "/Users/Feliz/Library/Application Support/JetBrains/IntelliJIdea2025.2/plugins/Shell Script/shellcheck",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/Feliz/Desktop/Development/QMS",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "rearrange.code.on.save": "true",
-    "settings.editor.selected.configurable": "ml.llm.LLMThirdPartyAiProvidersConfigurable",
-    "to.speed.mode.migration.done": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Makefile Target.logs.executor&quot;: &quot;Run&quot;,
+    &quot;Makefile Target.revision.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHELLCHECK.PATH&quot;: &quot;/Users/Feliz/Library/Application Support/JetBrains/IntelliJIdea2025.2/plugins/Shell Script/shellcheck&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/Feliz/Desktop/Development/QMS&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;rearrange.code.on.save&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/app/domain/utils" />
@@ -127,7 +117,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.23892.409" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.28539.33" />
       </set>
     </attachedChunks>
   </component>
@@ -275,7 +265,15 @@
       <option name="project" value="LOCAL" />
       <updated>1772487525787</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="added some analytics api">
+      <option name="closed" value="true" />
+      <created>1772910574379</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1772910574379</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -307,7 +305,8 @@
     <MESSAGE value="updated auth functionalities" />
     <MESSAGE value="added skills api" />
     <MESSAGE value="added tasks api" />
-    <option name="LAST_COMMIT_MESSAGE" value="added tasks api" />
+    <MESSAGE value="added some analytics api" />
+    <option name="LAST_COMMIT_MESSAGE" value="added some analytics api" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -333,7 +332,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/infrastructure/repositories/analytics_repository_sqlalchemy.py</url>
-          <line>540</line>
+          <line>549</line>
           <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">

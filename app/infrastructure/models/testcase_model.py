@@ -19,6 +19,8 @@ class TestCase(Base):
     description: Mapped[Optional[str]] = mapped_column(Text)
     test_case_status_id: Mapped[int] = mapped_column(Integer,
                                                      nullable=False)  # FK to status lookup table if you have one
+    test_case_status: Mapped[int] = mapped_column(Text, nullable=True)
+
     test_case_type_id: Mapped[int] = mapped_column(Integer, nullable=False)  # FK to type lookup table if you have one
     priority_id: Mapped[Optional[int]] = mapped_column(Integer)
     release_id: Mapped[Optional[int]] = mapped_column(Integer)  # FK to releases if modeled
@@ -66,7 +68,7 @@ class TestStep(Base):
     is_deleted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), default=None)
     test_step_status_id: Mapped[int] = mapped_column(Integer, nullable=True)
-
+    test_step_status: Mapped[str] = mapped_column(Text, nullable=True)
     test_case: Mapped["TestCase"] = relationship("TestCase", back_populates="steps")
 
     __table_args__ = (

@@ -192,3 +192,45 @@ class ProjectsMonthlyOut(BaseModel):
     items: List[ProjectsMonthlyItem]
     total_created: int
     total_active_of_created: int
+
+
+class RecentFeedItem(BaseModel):
+    title: str
+    actor_first_name: Optional[str] = None
+    performed_at: datetime = Field(..., description="UTC timestamp")
+    entity_type: Literal["user", "portfolio", "program", "project", "testcase", "teststep"]
+    action: Literal["created", "updated", "deleted", "executed"]
+    entity_id: int
+
+
+class RecentFeedsOut(BaseModel):
+    items: list[RecentFeedItem]
+    total: int
+
+
+class TopProjectItem(BaseModel):
+    project_id: int
+    project_name: str
+    testcases_total: int
+    testcases_executed: int
+    progress_percent: float
+    trend: Literal["up", "down", "flat"]
+    updates_in_window: int
+
+
+class TopProjectsOut(BaseModel):
+    items: list[TopProjectItem]
+    total: int
+
+
+class RecentProjectCreationItem(BaseModel):
+    id: int
+    owner_name: Optional[str] = None
+    name: str
+    created_at: datetime
+    status: str
+
+
+class RecentProjectCreationsOut(BaseModel):
+    items: list[RecentProjectCreationItem]
+    total: int

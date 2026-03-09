@@ -13,6 +13,8 @@ class ProjectBase(BaseModel):
     name: str = Field(min_length=1, max_length=255)
     description: Optional[str] = None
     environment: str = Field(min_length=1, max_length=255)
+    project_owner_id: Optional[int] = None
+    project_owner_name: Optional[str] = None
     website: Optional[str] = None
     is_active: Optional[bool] = True
     status: Optional[str] = "New"
@@ -55,6 +57,8 @@ class ProjectUpdate(BaseModel):
     description: Optional[str] = None
     environment: Optional[str] = None
     website: Optional[str] = None
+    project_owner_id: Optional[int] = None
+    project_owner_name: Optional[str] = None
     is_active: Optional[bool] = None
     status: Optional[str] = None
     working_hours: Optional[int] = Field(default=None, ge=0)
@@ -76,6 +80,8 @@ class ProjectSummary(BaseModel):
     environment: str
     name: str
     is_active: bool
+    project_owner_id: Optional[int] = None
+    project_owner_name: Optional[str] = None
     percent_complete: Optional[int] = None
     creation_date: datetime
     updated_date: datetime

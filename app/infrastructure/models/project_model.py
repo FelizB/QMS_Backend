@@ -35,7 +35,13 @@ class Project(Base):
                                                    onupdate=func.now())
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.true())
     status: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
-
+    project_owner_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="RESTRICT"),  # or CASCADE if you want
+        nullable=True,
+        index=True,
+    )
+    project_owner_name: Mapped[str] = mapped_column(String(255), nullable=True)
     # Planning fields
     working_hours: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     working_days: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
