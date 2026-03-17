@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional, Any, Dict, List
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import Field, ConfigDict
 
 from .common import CamelModel
 
@@ -39,6 +39,8 @@ class PortfolioUpdate(CamelModel):
 
 
 class PortfolioOut(CamelModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     name: str
     is_active: bool

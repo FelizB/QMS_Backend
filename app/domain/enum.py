@@ -44,4 +44,9 @@ class ActivityAction(str, Enum):
     CREATED = "created"
     UPDATED = "updated"
     DELETED = "deleted"
-    EXECUTED = "executed"  # Optional if you track execution event
+    EXECUTED = "executed"
+
+
+class ActivityOutcome(str, Enum):
+    SUCCESS = "success"
+    FAILED = "failed"

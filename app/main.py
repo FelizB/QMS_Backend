@@ -25,6 +25,7 @@ from app.presentation.controllers.user_routes import user_router
 from app.presentation.controllers.user_skills import skills_router
 from app.presentation.debug_handlers import install_debug_handlers
 from app.presentation.dependencies.auth import get_current_user
+from app.presentation.middleware.request_id import RequestIdMiddleware
 
 app = FastAPI(title=settings.app_name)
 app.include_router(user_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
@@ -44,6 +45,7 @@ app.include_router(task_router, prefix=settings.api_prefix, dependencies=[Depend
 app.include_router(group_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(enums_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(auth_router, prefix=settings.api_prefix)
+app.add_middleware(RequestIdMiddleware)
 install_debug_handlers(app)
 
 

@@ -56,3 +56,14 @@ class PortfolioTopProjectsOut(BaseModel):
     limit: int = 10
     items: List[Dict[str, int | str]] = Field(default_factory=list)
     # each: {project_id, project_name, test_case_count}
+
+
+class PortfolioCategoryCounts(BaseModel):
+    name: str
+    countsByStatus: Dict[str, int] = Field(default_factory=dict)
+
+
+class PortfolioCategoryProjectsByStatusOut(BaseModel):
+    year: int
+    statuses: List[str] = Field(default_factory=list)
+    categories: List[PortfolioCategoryCounts] = Field(default_factory=list)

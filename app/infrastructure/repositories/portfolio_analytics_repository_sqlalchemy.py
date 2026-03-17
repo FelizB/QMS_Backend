@@ -1,9 +1,10 @@
 # app/infrastructure/repositories/portfolio_analytics_repository.py
 from datetime import date, datetime
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.elements import and_
 
 from app.infrastructure.models.lookup_model import PriorityLkp, TestCaseTypeLkp, TestCaseStatusLkp
 from app.infrastructure.models.portfolio_model import Portfolio  # portfolio_id, is_deleted
@@ -11,6 +12,30 @@ from app.infrastructure.models.program_model import Program  # program_id, portf
 from app.infrastructure.models.project_model import Project  # project_id, program_id, is_deleted
 from app.infrastructure.models.testcase_model import TestCase
 from app.infrastructure.models.testcase_model import TestStep
+from app.presentation.schemas.portfolio_analytics_schema import PortfolioCategoryCounts, \
+    PortfolioCategoryProjectsByStatusOut
+
+
+def _current_year() -> int:
+    return date.today().year
+
+
+def _normalize_status(status: str) -> str:
+    # optional standardization for UI labels
+    # e.g. DB stores ON_HOLD but UI expects "On-hold"
+    if not status:
+        return "Unknown"
+    s = str(status).strip()
+    mapping = {
+        "NEW": "New",
+        "ON_HOLD": "On-hold",
+        "ONHOLD": "On-hold",
+        "ON-HOLD": "On-hold",
+        "ACTIVE": "Active",
+        "COMPLETED": "Completed",
+    }
+    upper = s.upper().replace(" ", "_")
+    return mapping.get(upper, s.title() if upper in {"ACTIVE", "COMPLETED"} else s)
 
 
 class PortfolioAnalyticsRepository:
@@ -233,3 +258,100 @@ class PortfolioAnalyticsRepository:
         )
         res = await self.session.execute(stmt)
         return [(int(pid), name, int(cnt)) for (pid, name, cnt) in res.all()]
+
+    async def get_projects_by_portfolio_category_and_status(self, year: int):
+        from datetime import datetime
+        from sqlalchemy import select, and_, func
+
+        start_dt = datetime(year, 1, 1)
+        end_dt = datetime(year + 1, 1, 1)
+
+        # Resolve columns safely
+        category_col = getattr(Portfolio, "category", None) or getattr(Portfolio, "product_house", None)
+        if category_col is None:
+            raise RuntimeError(
+                "Portfolio category column not found. Expected Portfolio.category or Portfolio.product_house"
+            )
+
+        created_col = getattr(Project, "creation_date", None) or getattr(Project, "created_on", None)
+        if created_col is None:
+            raise RuntimeError(
+                "Project created datetime column not found. Expected Project.creation_date or Project.created_on"
+            )
+
+        status_col = getattr(Project, "status", None)
+        if status_col is None:
+            raise RuntimeError("Project status column not found. Expected Project.status")
+
+        # Soft-delete guards
+        proj_ok = Project.is_deleted.is_(False) if hasattr(Project, "is_deleted") else True
+        prog_ok = Program.is_deleted.is_(False) if hasattr(Program, "is_deleted") else True
+        port_ok = Portfolio.is_deleted.is_(False) if hasattr(Portfolio, "is_deleted") else True
+
+        # Define the only statuses you consider valid (adjust as needed)
+        VALID_STATUSES = ["New", "Active", "In progress", "On-hold", "Completed"]
+
+        stmt = (
+            select(
+                category_col.label("category"),
+                status_col.label("status"),
+                func.count(Project.project_id).label("count"),
+            )
+            .select_from(Portfolio)
+            .outerjoin(
+                Program,
+                and_(
+                    Program.portfolio_id == Portfolio.id,
+                    prog_ok,
+                ),
+            )
+            .outerjoin(
+                Project,
+                and_(
+                    Project.program_id == Program.id,
+                    proj_ok,
+                    created_col >= start_dt,
+                    created_col < end_dt,
+                    status_col.is_not(None),  # exclude NULL statuses at the DB level
+                ),
+            )
+            .where(port_ok)
+            .group_by(category_col, status_col)
+            .order_by(category_col.asc())
+        )
+
+        result = await self.session.execute(stmt)
+        rows = result.all()  # [(category, status, count), ...]
+
+        by_cat: dict[str, dict[str, int]] = {}
+
+        for category, status, count in rows:
+            # Category: keep "Uncategorized" for NULL categories if you want; otherwise skip or rename
+            cat = str(category) if category is not None else "Uncategorized"
+
+            # Status: only accept valid statuses; skip others entirely
+            if status is None:
+                continue
+            st = str(status)
+            if st not in VALID_STATUSES:
+                # Skip any non-whitelisted status to avoid "Unknown" or noisy values
+                continue
+
+            by_cat.setdefault(cat, {})
+            by_cat[cat][st] = int(count or 0)
+
+        # Fixed ordered statuses (no extras, no "Unknown")
+        ordered_statuses = VALID_STATUSES
+
+        # Fill zeros for missing statuses per category
+        categories_out = []
+        for cat_name in sorted(by_cat.keys()):
+            counts = by_cat[cat_name]
+            filled = {s: int(counts.get(s, 0)) for s in ordered_statuses}
+            categories_out.append({"name": cat_name, "countsByStatus": filled})
+
+        return {
+            "year": year,
+            "statuses": ordered_statuses,
+            "categories": categories_out,
+        }

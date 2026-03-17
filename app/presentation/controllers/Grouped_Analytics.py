@@ -39,8 +39,7 @@ async def get_org_creations_monthly(
 ):
     if year is None:
         year = date.today().year
-
-    service = AnalyticsService(AnalyticsRepository(session))
+    service = AnalyticsService(session)
     return await service.get_monthly_creations(
         year=year,
         include_deleted=include_deleted,

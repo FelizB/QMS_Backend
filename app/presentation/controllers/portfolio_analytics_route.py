@@ -9,10 +9,14 @@ from app.core.db import get_session
 from app.infrastructure.repositories.portfolio_analytics_repository_sqlalchemy import PortfolioAnalyticsRepository
 from app.presentation.schemas.portfolio_analytics_schema import (
     PortfolioSummaryOut, PortfolioBreakdownOut, PortfolioCasesWithoutStepsOut,
-    PortfolioTrendOut, PortfolioTopProjectsOut
+    PortfolioTrendOut, PortfolioTopProjectsOut, PortfolioCategoryProjectsByStatusOut
 )
 
 p_router = APIRouter(prefix="/analytics/portfolios", tags=["portfolio analytics"])
+
+
+def svp(session: AsyncSession) -> PortfolioAnalyticsRepository:
+    return PortfolioAnalyticsRepository(session)
 
 
 def svc(session: AsyncSession) -> PortfolioAnalyticsService:
@@ -68,3 +72,15 @@ async def portfolio_top_projects(
         session: AsyncSession = Depends(get_session),
 ) -> PortfolioTopProjectsOut:
     return await svc(session).get_top_projects(portfolio_id, include_deleted, limit)
+
+
+@p_router.get(
+    "/portfolio-categories/projects-by-status",
+    response_model=PortfolioCategoryProjectsByStatusOut,
+    summary="Projects count by Portfolio Category (Product House) and status for a given year",
+)
+async def portfolio_category_projects_by_status(
+        year: int = Query(default_factory=lambda: date.today().year, ge=2000, le=2100),
+        session: AsyncSession = Depends(get_session),
+):
+    return await svp(session).get_projects_by_portfolio_category_and_status(year=year)

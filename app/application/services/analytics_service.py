@@ -140,7 +140,7 @@ class AnalyticsService:
             for r in rows
         ]
         return RecentFeedsOut(items=items, total=total)
-
+    
     async def top_projects(
             self,
             limit: int = 4,

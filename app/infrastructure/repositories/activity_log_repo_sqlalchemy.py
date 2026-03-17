@@ -1,14 +1,10 @@
+# app/infrastructure/repositories/activity_log_repo_sqlalchemy.py# app/infrastructure/repositories/activity_log_repo_sqlalchemy.py, Tuple
+from typing import Any
+
+from sqlalchemy import select, and_, desc, func, literal
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Sequence, Any
 from datetime import datetime
-
-from sqlalchemy.future import select
-from sqlalchemy.sql.elements import and_
-from sqlalchemy.sql.expression import desc
-from sqlalchemy.sql.functions import func
-
-from app.infrastructure.models.activity_log import ActivityLog, EntityType, ActivityAction
-from app.infrastructure.models.project_model import Project
+from app.infrastructure.models.activity_log import ActivityLog
 
 
 class ActivityRepository:
@@ -17,43 +13,47 @@ class ActivityRepository:
 
     async def get_recent(
             self,
-            limit: int = 5,
+            limit: int = 20,
+            since: datetime | None = None,
             org_id: int | None = None,
-    ) -> list[dict[str, Any]]:
-        pk_col = getattr(Project, "id", None) or getattr(Project, "project_id")
-        name_col = getattr(Project, "name", None) or getattr(Project, "project_name")
-        created_col = getattr(Project, "created_at", None) or getattr(Project, "creation_date")
-        status_col = getattr(Project, "status", None) or getattr(Project, "project_status")
-        owner_name_col = getattr(Project, "owner_name", None) or getattr(Project, "project_owner_name", None)
-
+    ) -> tuple[list[dict[str, Any]], int]:
+        """
+        Returns the most recent activity log rows as list[dict] + total count.
+        Keys are labeled to match RecentFeedItem / RecentFeedsOut:
+          - title, actor_first_name, performed_at, entity_type, action, entity_id
+        (Optional) outcome, error_type, error_message can be included for richer UI.
+        """
         filters = []
-        if hasattr(Project, "is_deleted"):
-            filters.append(Project.is_deleted == False)
-        if org_id is not None and hasattr(Project, "org_id"):
-            filters.append(Project.org_id == org_id)
+        if since is not None:
+            filters.append(ActivityLog.created_at >= since)
+        if org_id is not None and hasattr(ActivityLog, "org_id"):
+            filters.append(ActivityLog.org_id == org_id)
 
-        sel = [
-            pk_col.label("id"),
-            name_col.label("name"),
-            created_col.label("created_at"),
-            status_col.label("status"),
-        ]
-        if owner_name_col is not None:
-            sel.append(owner_name_col.label("owner_name"))
+        # Count query
+        total_stmt = select(func.count(ActivityLog.id))
+        if filters:
+            total_stmt = total_stmt.where(and_(*filters))
+        total = (await self.session.execute(total_stmt)).scalar_one()
 
-        q = (select(*sel).where(and_(*filters)) if filters else select(*sel)) \
-            .order_by(desc(created_col)) \
-            .limit(limit)
+        # Labeled select → RowMapping → dicts
+        stmt = select(
+            ActivityLog.title.label("title"),
+            ActivityLog.actor_first_name.label("actor_first_name"),
+            ActivityLog.created_at.label("performed_at"),
+            ActivityLog.entity_type.label("entity_type"),
+            ActivityLog.action.label("action"),
+            ActivityLog.entity_id.label("entity_id"),
+            # Uncomment if you want to surface outcome/errors in UI:
+            # ActivityLog.outcome.label("outcome"),
+            # ActivityLog.error_type.label("error_type"),
+            # ActivityLog.error_message.label("error_message"),
+        )
+        if filters:
+            stmt = stmt.where(and_(*filters))
 
-        rows = (await self.session.execute(q)).mappings().all()
-        # Always return a list of dicts
-        return [
-            {
-                "id": int(r["id"]),
-                "name": r["name"],
-                "created_at": r["created_at"],
-                "status": r["status"],
-                "owner_name": r.get("owner_name"),
-            }
-            for r in rows
-        ]
+        stmt = stmt.order_by(desc(ActivityLog.created_at)).limit(limit)
+
+        rows = (await self.session.execute(stmt)).mappings().all()
+        items = [dict(r) for r in rows]
+
+        return items, total

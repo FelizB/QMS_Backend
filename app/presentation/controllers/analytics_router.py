@@ -207,7 +207,7 @@ async def projects_status_counts(
 
 
 def get_analytics_service(session: AsyncSession = Depends(get_session)) -> AnalyticsService:
-    repo = ProjectAnalyticsRepository(session)
+    repo = session
     return AnalyticsService(repo)
 
 
