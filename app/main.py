@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, JSONResponse
 from sqlalchemy.exc import NoResultFound
 from starlette.status import HTTP_409_CONFLICT, HTTP_400_BAD_REQUEST, HTTP_422_UNPROCESSABLE_ENTITY
-
+from app.core.cache import RolePermsCache
 from app.core.settings import settings
 from app.domain.errors import OwnershipError, DomainError
 from app.presentation.controllers.Grouped_Analytics import group_router
@@ -26,6 +26,9 @@ from app.presentation.controllers.user_skills import skills_router
 from app.presentation.debug_handlers import install_debug_handlers
 from app.presentation.dependencies.auth import get_current_user
 from app.presentation.middleware.request_id import RequestIdMiddleware
+from app.presentation.controllers.approvals_routes import approval_router
+from app.presentation.controllers.rolematrix_route import role_router
+from app.presentation.controllers.admin_seed_route import seed_router
 
 app = FastAPI(title=settings.app_name)
 app.include_router(user_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
@@ -44,6 +47,9 @@ app.include_router(skills_router, prefix=settings.api_prefix, dependencies=[Depe
 app.include_router(task_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(group_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(enums_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(approval_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(role_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(seed_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(auth_router, prefix=settings.api_prefix)
 app.add_middleware(RequestIdMiddleware)
 install_debug_handlers(app)
@@ -113,3 +119,4 @@ app.add_middleware(
     expose_headers=[],
     max_age=3600,  # cache preflight (optional)
 )
+role_perms_cache = RolePermsCache(ttl_seconds=300, redis_client=None)

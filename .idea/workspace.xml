@@ -4,30 +4,34 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="added some dashboard apis">
-      <change afterPath="$PROJECT_DIR$/app/application/services/audit_helper.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/domain/utils/filters.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/domain/utils/key_map.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/domain/utils/pydamic_utils.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/domain/utils/repo_base.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/domain/utils/select.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/dependencies/actor_ctx.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/middleware/error_audit.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/middleware/request_id.py" afterDir="false" />
+    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="Updated some APIs">
+      <change afterPath="$PROJECT_DIR$/app/core/cache.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/core/deps.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/domain/security/role_policy.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/models/approval.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/infrastructure/models/role_matrix.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/admin_seed_route.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/approvals_routes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/rolematrix_route.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/dependencies/role_deriver.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/presentation/dependencies/role_permissions.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/scripts/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/scripts/seed_role_matrix.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/services/analytics_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/services/analytics_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/core/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/security.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/security.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/domain/enum.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/domain/enum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/activity_log.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/activity_log.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/infrastructure/models/portfolio_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/portfolio_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/activity_log_repo_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/activity_log_repo_sqlalchemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/portfolio_analytics_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/portfolio_analytics_repository_sqlalchemy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/user_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/TokenBlacklistRepository.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/TokenBlacklistRepository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/user_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/user_repository_sqlalchemy.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/Grouped_Analytics.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/Grouped_Analytics.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/analytics_router.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/analytics_router.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/portfolio_analytics_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/portfolio_analytics_route.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/portfolio_analytics_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/portfolio_analytics_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/portfolio_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/portfolio_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/auth_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/auth_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/project_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/project_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/auth_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/auth_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/user_schema.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/migrations/env.py" beforeDir="false" afterPath="$PROJECT_DIR$/migrations/env.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,11 +102,11 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/app/scripts" />
+      <recent name="$PROJECT_DIR$/app" />
+      <recent name="$PROJECT_DIR$/scripts" />
       <recent name="$PROJECT_DIR$/app/domain/utils" />
       <recent name="$PROJECT_DIR$/app/application/use_cases/analytics" />
-      <recent name="$PROJECT_DIR$/app/presentation/schemas" />
-      <recent name="$PROJECT_DIR$/app/infrastructure/models" />
-      <recent name="$PROJECT_DIR$" />
     </key>
   </component>
   <component name="RunManager" selected="Makefile Target.revision">
@@ -292,7 +296,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773060901758</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Updated some APIs">
+      <option name="closed" value="true" />
+      <created>1773757327508</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1773757327508</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -326,7 +338,8 @@
     <MESSAGE value="added tasks api" />
     <MESSAGE value="added some analytics api" />
     <MESSAGE value="added some dashboard apis" />
-    <option name="LAST_COMMIT_MESSAGE" value="added some dashboard apis" />
+    <MESSAGE value="Updated some APIs" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated some APIs" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -349,11 +362,6 @@
           <url>file://$PROJECT_DIR$/app/application/use_cases/analytics/projects_analytics_service.py</url>
           <line>214</line>
           <option name="timeStamp" value="7" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/app/core/security.py</url>
-          <line>1</line>
-          <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/app/presentation/schemas/portfolio_schema.py</url>

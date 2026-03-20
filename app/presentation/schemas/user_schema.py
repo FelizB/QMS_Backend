@@ -20,16 +20,13 @@ class UserBase(CamelModel):
     username: str = Field(min_length=3, max_length=50)
     email: EmailStr = Field(max_length=100)
     department: str
-    role: str
+    role_id: int
     unit: str
     first_name: str
     middle_name: Optional[str] = None
     last_name: str
     gender: Optional[str] = None
     birthday: date | None = None
-    rss_token: Optional[str] = None
-    admin: bool = False  # default server-side too
-    superuser: bool = False
     phone: Optional[str] = None
     site: Optional[str] = None
     address: Optional[str] = None
@@ -46,7 +43,7 @@ class UserOut(CamelModel):
     id: int
     username: str
     email: EmailStr
-    role: str
+    role_id: int
     first_name: str
     middle_name: Optional[str] = None
     last_name: str
@@ -63,11 +60,9 @@ class UserSummary(CamelModel):
     created_at: datetime
     updated_at: datetime
     department: str
-    role: str
+    role_id: int
     unit: str
     active: bool
-    admin: bool
-    superuser: bool
     approved: bool
     locked: bool
     is_deleted: bool
@@ -81,11 +76,10 @@ class UserUpdate(CamelModel):
     active: Optional[bool] = None
     approved: Optional[bool] = None
     locked: Optional[bool] = None
-    admin: Optional[bool] = None
+    role: Optional[str] = None
     first_name: Optional[str] = None
     middle_name: Optional[str] = None
     last_name: Optional[str] = None
-    rss_token: Optional[str] = None
     phone: Optional[str] = None
     site: Optional[str] = None
     address: Optional[str] = None

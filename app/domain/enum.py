@@ -1,4 +1,5 @@
 from enum import Enum
+from enum import StrEnum
 
 
 class TaskType(str, Enum):
@@ -50,3 +51,37 @@ class ActivityAction(str, Enum):
 class ActivityOutcome(str, Enum):
     SUCCESS = "success"
     FAILED = "failed"
+
+
+class Role(str, Enum):
+    SUPERADMIN = "SUPERADMIN"
+    ADMIN = "ADMIN"
+    MANAGER = "MANAGER"
+    USER = "USER"
+
+
+class RoleAction(str, Enum):
+    INITIATE = "INITIATE"
+    VIEW = "VIEW"
+    REVIEW = "REVIEW"
+    APPROVE = "APPROVE"
+
+
+class EntityType(StrEnum):
+    PROJECT = "project"
+    PROGRAM = "program"
+    PORTFOLIO = "portfolio"
+    USER = "user"
+
+
+class Action(StrEnum):
+    CREATE = "create"
+    UPDATE = "update"
+    DELETE = "delete"
+
+
+class ApprovalStatus(StrEnum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    CANCELLED = "cancelled"

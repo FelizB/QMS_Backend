@@ -1,5 +1,4 @@
 from datetime import timedelta
-
 from dotenv import load_dotenv
 from passlib.context import CryptContext
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -13,7 +12,8 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         extra="ignore",
-        case_sensitive=False
+        env_prefix="QMS_",
+        case_sensitive=False,
     )
 
     app_name: str = "QMS Backend"
@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = "CHANGE_ME_32+_CHARS"  # Use a long random value in prod
     JWT_REFRESH_SECRET_KEY: str = "CHANGE_ME_REFRESH_32+_CHARS"
     JWT_ALGORITHM: str = "HS256"
+    JWT_ISS: str = "https://qms.example.com"
+    JWT_AUD: str = "https://api.qms.example.com"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     JWT_LEEWAY_SECONDS: int = 60

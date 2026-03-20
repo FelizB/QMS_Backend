@@ -6,7 +6,7 @@ from typing import Optional, List, Dict
 import sqlalchemy as sa
 from sqlalchemy import String, Integer, Boolean, DateTime, text, Date
 from sqlalchemy.dialects.postgresql.json import JSONB
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from .base import Base
@@ -17,55 +17,48 @@ class User(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
-    # credentials / identity
-    username: Mapped[str] = mapped_column(String(128), name="Username", unique=True, nullable=False)
-    initials: Mapped[str] = mapped_column(String(2), name="Initials", unique=True, nullable=False)
-    initials_colors = mapped_column(String(128), name="Initials_colors", unique=True, nullable=False)
-    email: Mapped[str] = mapped_column(String(255), name="Email", unique=True, nullable=False)
+    username: Mapped[str] = mapped_column(String(128), unique=True, nullable=False)
+    initials: Mapped[str] = mapped_column(String(2), nullable=False)
+    initials_colors = mapped_column(String(128), unique=True, nullable=False)
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    # flags
-    admin: Mapped[bool] = mapped_column(Boolean, name="Admin", nullable=False, server_default=sa.sql.false())
-    superuser: Mapped[bool] = mapped_column(Boolean, name="Superuser", nullable=False, server_default=sa.sql.false())
-    active: Mapped[bool] = mapped_column(Boolean, name="Active", nullable=False, server_default=sa.sql.true())
-    approved: Mapped[bool] = mapped_column(Boolean, name="Approved", nullable=False, server_default=sa.sql.false())
-    locked: Mapped[bool] = mapped_column(Boolean, name="Locked", nullable=False, server_default=sa.sql.false())
+    active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.true())
+    approved: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.false())
+    locked: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.false())
     token_version: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
 
-    # org info
-    department: Mapped[str] = mapped_column(String(255), name="Department", nullable=False)
-    role: Mapped[str] = mapped_column(String(255), name="Role", nullable=False)
-    unit: Mapped[str] = mapped_column(String(255), name="Unit", nullable=False)
-    first_name: Mapped[str] = mapped_column(String(255), name="FirstName", nullable=False)
-    middle_name: Mapped[Optional[str]] = mapped_column(String(255), name="MiddleName", nullable=True)
-    last_name: Mapped[str] = mapped_column(String(255), name="LastName", nullable=False)
+    department: Mapped[str] = mapped_column(String(255), nullable=False)
+    unit: Mapped[str] = mapped_column(String(255), nullable=False)
+    first_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    middle_name: Mapped[Optional[str]] = mapped_column(String(255))
+    last_name: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    gender: Mapped[Optional[str]] = mapped_column("gender", String(16), nullable=True)
-    birthday: Mapped[date | None] = mapped_column(Date, nullable=True)
+    gender: Mapped[Optional[str]] = mapped_column(String(16))
+    birthday: Mapped[Optional[date]] = mapped_column(Date)
 
-    # tokens
-    rss_token: Mapped[Optional[str]] = mapped_column(String(255), name="RssToken", nullable=True)
-    # audit
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), name="created_at", nullable=False,
-                                                 server_default=sa.func.now(), )
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), name="updated_at", nullable=False,
-                                                 server_default=sa.func.now(), onupdate=sa.func.now(), )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=sa.func.now())
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=sa.func.now(),
+                                                 onupdate=sa.func.now())
 
-    # soft delete
-    is_deleted: Mapped[bool] = mapped_column(Boolean, name="is_deleted", nullable=False,
-                                             server_default=sa.sql.false(), )
-    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), name="deleted_at", nullable=True, )
+    is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.false())
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
 
-    phone: Mapped[Optional[str]] = mapped_column(String(32), unique=True, nullable=True)
-    site: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    address: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
-    country: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    phone: Mapped[Optional[str]] = mapped_column(String(32), unique=True)
+    site: Mapped[Optional[str]] = mapped_column(String(255))
+    address: Mapped[Optional[str]] = mapped_column(String(255))
+    country: Mapped[Optional[str]] = mapped_column(String(255))
+
     primary_worksite_info: Mapped[Dict[str, object]] = mapped_column(JSONB, nullable=False,
-                                                                     server_default=text("'{}'::jsonb"), )
+                                                                     server_default=text("'{}'::jsonb"))
     secondary_worksite_info: Mapped[Dict[str, object]] = mapped_column(JSONB, nullable=False,
-                                                                       server_default=text("'{}'::jsonb"), )
+                                                                       server_default=text("'{}'::jsonb"))
+
+    # ❗ NEW: SINGLE ROLE
+    role_id: Mapped[int] = mapped_column(sa.ForeignKey("roles.id"), nullable=False)
+    role = relationship("Role", lazy="selectin")
 
     __table_args__ = (
-        UniqueConstraint("Email", name="uq_users_email"),
-        UniqueConstraint("Username", name="uq_users_username"),
+        UniqueConstraint("email", name="uq_users_email"),
+        UniqueConstraint("username", name="uq_users_username"),
     )

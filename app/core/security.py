@@ -1,8 +1,6 @@
-# app/core/security.py
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, Dict
 from uuid import uuid4
-
 from jose import jwt
 from passlib.context import CryptContext
 
@@ -42,31 +40,47 @@ def _merge_extra(base: Dict[str, Any], extra: Optional[Dict[str, Any]]) -> Dict[
     return base
 
 
-def create_access_token(subject: str | int, *, token_version: int, extra: Optional[Dict[str, Any]] = None) -> str:
-    iat = _now()
-    payload: Dict[str, Any] = {
-        "sub": str(subject),
+def _base_claims(version: int, subject: str | int, role_id: int, rv: int, sid: Optional[str] = None) -> Dict[
+    str, Any]:
+    return {
         "type": "access",
-        "ver": int(token_version),  # <-- NEW
-        "jti": uuid4().hex,  # <-- NEW
-        "iat": int(iat.timestamp()),  # <-- NEW
+        "iss": settings.JWT_ISS,
+        "aud": settings.JWT_AUD,
+        "sub": subject,  # user id
+        "jti": uuid4().hex,
+        "ver": version,
+        "sid": sid or str(uuid4()),
+        "iat": int(_now().timestamp()),
+        "role_id": role_id,
         "exp": _exp(settings.ACCESS_TOKEN_EXPIRE_MINUTES),
+        "rv": rv,  # role version
     }
-    payload = _merge_extra(payload, extra)
+
+
+def create_access_token(*, version: int, subject: str, role_id: int, rv: int, sid: Optional[str] = None,
+
+                        extra: Optional[Dict[str, Any]] = None,
+                        minutes: int = settings.ACCESS_TOKEN_EXPIRE_MINUTES) -> str:
+    payload = _base_claims(version=version, subject=subject, role_id=role_id, rv=rv, sid=sid)
+    exp = _now() + timedelta(minutes=minutes)
+    payload["exp"] = int(exp.timestamp())
+    if extra:
+        payload.update(extra)
     return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
-def create_refresh_token(subject: str | int, *, token_version: int, extra: Optional[Dict[str, Any]] = None) -> str:
-    iat = _now()
-    payload: Dict[str, Any] = {
-        "sub": str(subject),
-        "type": "refresh",
-        "ver": int(token_version),  # <-- NEW
-        "jti": uuid4().hex,  # <-- NEW
-        "iat": int(iat.timestamp()),  # <-- NEW
-        "exp": _exp_days(settings.REFRESH_TOKEN_EXPIRE_DAYS),
+def create_refresh_token(*, subject: str, sid: str) -> str:
+    payload = {
+        "iss": settings.JWT_ISS,
+        "aud": settings.JWT_AUD,
+        "sub": subject,
+        "jti": uuid4().hex,
+        "sid": sid,
+        "iat": int(_now().timestamp()),
+        "typ": "refresh",
+        "exp": int((_now() + timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)).timestamp()),
     }
-    payload = _merge_extra(payload, extra)
+
     return jwt.encode(payload, settings.JWT_REFRESH_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
 
 
@@ -76,15 +90,16 @@ def _decode_compat(token: str, key: str) -> Dict[str, Any]:
       - PyJWT: supports top-level `leeway=...`
       - python-jose: expects `options={'leeway': ...}`
     """
-    verify_opts = {"verify_aud": False}
+    verify_opts = {"verify_aud": True, "verify_iss": True}
     leeway = settings.JWT_LEEWAY_SECONDS
     try:
         return jwt.decode(
             token,
             key,
             algorithms=[settings.JWT_ALGORITHM],
+            audience=settings.JWT_AUD,
+            issuer=settings.JWT_ISS,
             options=verify_opts,
-            leeway=leeway,
         )
     except TypeError:
         jose_opts = dict(verify_opts)

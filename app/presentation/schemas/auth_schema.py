@@ -1,7 +1,7 @@
 from datetime import datetime, date
 from typing import Optional, List, Dict, Any
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
 
 class RegisterIn(BaseModel):
@@ -29,17 +29,25 @@ class WorksiteInfo(BaseModel):
     extra: Dict[str, Any] = Field(default_factory=dict)
 
 
+class RoleOut(BaseModel):
+    id: int
+    name: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class UserOut(BaseModel):
     id: int
     email: EmailStr
     username: str
     active: bool
-    superuser: bool
-    admin: bool
     approved: bool
     locked: bool
     department: Optional[str] = None
-    role: Optional[str] = None
+    role: RoleOut
+    permissions: List[str] = Field(default_factory=list)
+    flags: dict = Field(default_factory=dict)
+    session: dict = Field(default_factory=dict)
     unit: Optional[str] = None
     first_name: Optional[str] = None
     middle_name: Optional[str] = None
@@ -55,7 +63,7 @@ class UserOut(BaseModel):
     primary_worksite_info: WorksiteInfo = Field(default_factory=WorksiteInfo)
     secondary_worksite_info: WorksiteInfo = Field(default_factory=WorksiteInfo)
 
-    model_config = {"from_attributes": True}
+    model_config = ConfigDict(from_attributes=True)
 
 
 class LogoutOut(BaseModel):

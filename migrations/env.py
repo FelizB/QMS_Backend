@@ -40,7 +40,8 @@ if db_url:
 from app.infrastructure.models.base import Base
 # Import each model module so tables register on Base.metadata
 from app.infrastructure.models import user_model, project_model, portfolio_model, program_model, \
-    testcase_model, file_attachment_model, lookup_model, token_blacklist, user_model, tasks_model, activity_log
+    testcase_model, file_attachment_model, lookup_model, token_blacklist, user_model, tasks_model, activity_log, \
+    approval, role_matrix
 
 target_metadata = Base.metadata
 

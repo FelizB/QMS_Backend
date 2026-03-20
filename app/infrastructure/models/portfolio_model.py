@@ -18,8 +18,8 @@ class Portfolio(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
-    name: Mapped[str] = mapped_column(String(200), nullable=False, unique=True)
-    category: Mapped[str] = mapped_column(String(200), nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(String(200), nullable=False, unique=False)
+    category: Mapped[str] = mapped_column(String(200), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     website: Mapped[Optional[str]] = mapped_column(String(300), nullable=True)
 

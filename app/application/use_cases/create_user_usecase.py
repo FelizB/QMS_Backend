@@ -1,185 +1,229 @@
 from typing import Optional, Any, Dict, List
-
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_409_CONFLICT
 
 from app.core.security import get_password_hash
 from app.domain.utils.initials import generate_initials_and_colors
-from app.infrastructure.models.user_model import User as UserModel  # adjust import path if needed
-from app.infrastructure.repositories.user_repository_sqlalchemy import SQLAlchemyUserRepository  # or your concrete repo
 
+from app.infrastructure.models.user_model import User as UserModel
+from app.infrastructure.repositories.user_repository_sqlalchemy import SQLAlchemyUserRepository
+
+# Role Matrix Models
+from app.infrastructure.models.role_matrix import Role, UserRole
+
+
+# ----------------- Helpers -----------------
 
 def _norm(s: Optional[str]) -> Optional[str]:
-    """Trim string; keep None for non-strings or empty after trim."""
     if isinstance(s, str):
         s2 = s.strip()
-        return s2 if s2 != "" else None
+        return s2 if s2 else None
     return s
 
 
-def _list_str(v: Any) -> List[str]:
-    """Ensure a list[str] with trimmed, non-empty strings."""
-    if isinstance(v, list):
-        out: List[str] = []
-        for x in v:
-            sx = str(x).strip()
-            if sx:
-                out.append(sx)
-        return out
-    return []
-
-
 def _dict_obj(v: Any) -> Dict[str, Any]:
-    """Ensure a plain dict; otherwise {}."""
     return v if isinstance(v, dict) else {}
 
 
+def _as_roles_list(payload) -> List[str]:
+    """
+    Accepts payload.roles: list[str]
+    Defaults to USER if missing.
+    """
+    if hasattr(payload, "roles") and isinstance(payload.roles, list):
+        roles = [str(r).strip().upper() for r in payload.roles if str(r).strip()]
+        if roles:
+            return roles
+    return ["USER"]
+
+
+# ----------------- Role Assignment -----------------
+
+SUPERADMIN = "SUPERADMIN"
+ADMIN = "ADMIN"
+USER = "USER"
+
+
+async def _resolve_role_ids(session, role_names: List[str]) -> Dict[str, int]:
+    if not role_names:
+        return {}
+    stmt = select(Role.name, Role.id).where(Role.name.in_(role_names))
+    rows = (await session.execute(stmt)).all()
+    return {name.upper(): rid for (name, rid) in rows}
+
+
+async def _existing_user_role_ids(session, user_id: int) -> set[int]:
+    stmt = select(UserRole.role_id).where(UserRole.user_id == user_id)
+    return set((await session.execute(stmt)).scalars().all())
+
+
+def _filter_roles_by_creator(
+        requested: List[str],
+        *,
+        current_is_superuser: bool,
+        current_is_admin: bool,
+) -> List[str]:
+    if current_is_superuser:
+        return requested
+
+    if current_is_admin:
+        return [r for r in requested if r != SUPERADMIN]
+
+    return [USER]
+
+
+async def _assign_roles_to_user(
+        session,
+        user_id: int,
+        requested_roles: List[str],
+        *,
+        current_is_superuser: bool,
+        current_is_admin: bool,
+) -> List[str]:
+    requested = [r.upper().strip() for r in requested_roles if r]
+    requested = _filter_roles_by_creator(
+        requested,
+        current_is_superuser=current_is_superuser,
+        current_is_admin=current_is_admin,
+    )
+
+    # Resolve to IDs
+    map_name_to_id = await _resolve_role_ids(session, requested)
+
+    # Check for unknown roles
+    unknown = [r for r in requested if r not in map_name_to_id]
+    if unknown:
+        raise HTTPException(status_code=400, detail=f"Unknown roles: {', '.join(unknown)}")
+
+    existing = await _existing_user_role_ids(session, user_id)
+    to_insert = []
+
+    for r in requested:
+        rid = map_name_to_id[r]
+        if rid not in existing:
+            to_insert.append(UserRole(user_id=user_id, role_id=rid))
+
+    if to_insert:
+        session.add_all(to_insert)
+        await session.flush()
+
+    return requested
+
+
+# ----------------- CreateUserUseCase -----------------
 class CreateUserUseCase:
     """
-    Policy:
-      - superuser: may create admin/superuser/normal (payload flags honored)
-      - admin (not superuser): may create only normal (flags forced False)
-      - authenticated normal: forbidden (403)
-      - unauthenticated: self-register as normal (if allowed)
+    FINAL SINGLE-ROLE VERSION
     """
 
-    def __init__(self, repo: SQLAlchemyUserRepository, allow_public_self_register: bool = True):
+    def __init__(self, repo: SQLAlchemyUserRepository, allow_public_self_register=True):
         self.repo = repo
         self.allow_public_self_register = allow_public_self_register
 
     async def execute(
             self,
             *,
-            payload,  # Pydantic UserCreate
+            payload,
             current_is_admin: bool,
             current_is_superuser: bool,
             is_authenticated: bool,
+            USER_ROLE_ID=5
     ) -> UserModel:
 
+        session = self.repo.session
+
+        # -------- ACCESS RULES --------
+        if not is_authenticated:
+            # Self-register → force USER role
+            selected_role_id = USER_ROLE_ID
+
+        else:
+            if not current_is_admin and not current_is_superuser:
+                raise HTTPException(403, "Only ADMIN or SUPERADMIN can create users")
+
+            # Validate they sent a role
+            if not hasattr(payload, "role_id") or payload.role_id is None:
+                raise HTTPException(400, "A role must be selected")
+
+            selected_role_id = payload.role_id
+
+        # -------- RESOLVE ROLE --------
+        role = await session.get(Role, selected_role_id)
+        if not role:
+            raise HTTPException(400, f"Invalid role_id: {selected_role_id}")
+
+        role_name = role.name.upper()
+
+        # -------- PERMISSION LOGIC --------
+        if current_is_admin and role_name == "SUPERADMIN":
+            raise HTTPException(403, "Admin cannot assign SUPERADMIN")
+
+        # -------- NORMALIZE INPUT --------
         email = (_norm(payload.email) or "").lower()
         username = _norm(payload.username)
-        department = _norm(payload.department)
-        role = _norm(payload.role)
-        unit = _norm(payload.unit)
+
         first_name = _norm(payload.first_name)
-        middle_name = _norm(payload.middle_name)
         last_name = _norm(payload.last_name)
-        rss_token = _norm(payload.rss_token)
+        middle_name = _norm(payload.middle_name)
         gender = _norm(payload.gender)
         birthday = _norm(payload.birthday)
+
+        department = _norm(payload.department)
+        unit = _norm(payload.unit)
 
         phone = _norm(getattr(payload, "phone", None))
         site = _norm(getattr(payload, "site", None))
         address = _norm(getattr(payload, "address", None))
         country = _norm(getattr(payload, "country", None))
-        primary_worksite_info = _dict_obj(getattr(payload, "primary_worksite_info", None))  # dict
-        secondary_worksite_info = _dict_obj(getattr(payload, "secondary_worksite_info", None))  # dict
 
-        # Decide flags
-        if current_is_superuser:
-            admin_flag = bool(getattr(payload, "admin", False))
-            superuser_flag = bool(getattr(payload, "superuser", False))
-            approved = True
-            active = True
-        elif current_is_admin:
-            # Admin can only create normal users
-            admin_flag = False
-            superuser_flag = False
-            approved = True
-            active = True
-        else:
-            # Normal users cannot create; unauthenticated may self-register if enabled
-            if is_authenticated:
-                raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Only superuser/admin can create users")
-            if not self.allow_public_self_register:
-                raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Self registration is disabled")
-            admin_flag = False
-            superuser_flag = False
-            approved = False  # you can require manual approval
-            active = True
+        primary_ws = _dict_obj(getattr(payload, "primary_worksite_info", None))
+        secondary_ws = _dict_obj(getattr(payload, "secondary_worksite_info", None))
 
+        # -------- FLAGS --------
+        approved = True if (current_is_superuser or current_is_admin) else False
+        active = True
         locked = False
-        hashed = get_password_hash(payload.password)
 
-        # Initials & colors
-        init, init_colors = generate_initials_and_colors(
-            payload.first_name,
-            payload.last_name,
-        )
+        hashed_pw = get_password_hash(payload.password)
+        init, init_colors = generate_initials_and_colors(first_name, last_name)
 
-        # Build ORM model instance
-        # NOTE: JSONB columns are NOT NULL with server defaults—passing [] / {} is safe too.
+        # -------- CREATE ORM USER --------
         user_model = UserModel(
             email=email,
             username=username,
+            hashed_password=hashed_pw,
             initials=init,
             initials_colors=init_colors,
-            hashed_password=hashed,
-            admin=admin_flag,
-            superuser=superuser_flag,
+
             active=active,
             approved=approved,
             locked=locked,
+
             department=department,
-            role=role,
             unit=unit,
+
             first_name=first_name,
             middle_name=middle_name,
             last_name=last_name,
-            rss_token=rss_token,
             gender=gender,
             birthday=birthday,
+
             phone=phone,
             site=site,
             address=address,
             country=country,
-            primary_worksite_info=primary_worksite_info,  # JSONB {}
-            secondary_worksite_info=secondary_worksite_info,  # JSONB {}
+
+            primary_worksite_info=primary_ws,
+            secondary_worksite_info=secondary_ws,
+
+            role_id=selected_role_id,
         )
 
-        # Create via repository (commits inside)
         try:
-            return await self.repo.create(user_model)
+            user = await self.repo.create(user_model)
+            return user
 
         except IntegrityError as e:
-            # SQLAlchemy context
-            stmt = getattr(e, 'statement', None)
-            params = getattr(e, 'params', None)
-
-            # DBAPI (psycopg/asyncpg) exception
-            orig = getattr(e, 'orig', None)
-            pgcode = getattr(orig, 'pgcode', None)  # e.g., '23505' for unique_violation
-            diag = getattr(orig, 'diag', None)  # Diagnostic object (may be None)
-
-            constraint = getattr(diag, 'constraint_name', None)
-            schema = getattr(diag, 'schema_name', None)
-            table = getattr(diag, 'table_name', None)
-            column = getattr(diag, 'column_name', None)
-            detail = getattr(diag, 'detail', None)
-            message_primary = getattr(diag, 'message_primary', None)
-
-            # Log (replace prints with your logger)
-            print("SQLALCHEMY STMT:", stmt)
-            print("PARAMS:", params)
-            print("PGCODE:", pgcode)
-            print("DIAG:", {
-                "message_primary": message_primary,
-                "detail": detail,
-                "schema": schema,
-                "table": table,
-                "column": column,
-                "constraint": constraint,
-            })
-
-            # Friendly messages
-            if pgcode == '23505':  # unique_violation (e.g., email or phone unique)
-                # You can branch by constraint to be more specific:
-                # if constraint == 'ix_users_phone_unique': ...
-                raise HTTPException(status_code=409, detail=f"Unique violation on {constraint or table}")
-            elif pgcode == '23502':  # not_null_violation
-                raise HTTPException(status_code=400, detail=f"NULL in NOT NULL column: {column}")
-            elif pgcode == '23503':  # foreign_key_violation
-                raise HTTPException(status_code=400, detail=f"Foreign key violation on {constraint}")
-            else:
-                raise HTTPException(status_code=HTTP_409_CONFLICT, detail="Username or email already registered")
+            raise HTTPException(409, "Unable to create user")
