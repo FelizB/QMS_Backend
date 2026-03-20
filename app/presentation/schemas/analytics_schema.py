@@ -3,6 +3,8 @@ from datetime import date, datetime
 from typing import Dict, List, Optional, Literal
 from pydantic import BaseModel, Field
 
+from app.domain.enum import ActivityAction
+
 
 class TestCaseSummaryOut(BaseModel):
     project_id: int
@@ -198,8 +200,8 @@ class RecentFeedItem(BaseModel):
     title: str
     actor_first_name: Optional[str] = None
     performed_at: datetime = Field(..., description="UTC timestamp")
-    entity_type: Literal["user", "portfolio", "program", "project", "testcase", "teststep"]
-    action: Literal["created", "updated", "deleted", "executed"]
+    entity_type: str
+    action: ActivityAction
     entity_id: int
 
 

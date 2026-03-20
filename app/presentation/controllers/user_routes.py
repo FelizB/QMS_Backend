@@ -1,9 +1,14 @@
+from fastapi import Request
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.functions import user
 
+from app.application.services.audit import audit
 from app.application.use_cases.delete_user_usecase import DeleteUserUseCase
 from app.core.db import get_session
+from app.domain.enum import EntityType, ActivityAction, ActivityOutcome
 from app.infrastructure.repositories.user_repository_sqlalchemy import SQLAlchemyUserRepository
 from app.presentation.schemas.user_schema import UserSummary, UserUpdate, UserDeleteResponse
 
@@ -51,7 +56,8 @@ async def get_user_by_email(email: str, repo=Depends(get_user_repo)):
 
 
 @user_router.patch("/{id}", response_model=UserSummary)
-async def update_user(id: int, payload: UserUpdate, repo=Depends(get_user_repo)):
+async def update_user(id: int, payload: UserUpdate, repo=Depends(get_user_repo), request: Request = None,
+                      session: AsyncSession = Depends(get_session)):
     fields = payload.model_dump(exclude_unset=True)
     # Normalize optional fields if present
     if "Email" in fields and fields["Email"]:
@@ -59,19 +65,59 @@ async def update_user(id: int, payload: UserUpdate, repo=Depends(get_user_repo))
 
     try:
         row = await repo.update_fields(id, fields)
+        await audit(
+            session,
+            request,
+            title="updated Successful",
+            entity_type=EntityType.USER,
+            entity_id=user.id,
+            action=ActivityAction.UPDATE,
+            outcome=ActivityOutcome.SUCCESS,
+            actor_id=user.id,
+            actor_first_name=user.first_name,
+            meta={"username": user.username},
+        )
+        await session.commit()
     except IntegrityError:
         raise HTTPException(status_code=409, detail="Username or Email already exists")
 
     if not row:
         raise HTTPException(status_code=404, detail="User not found")
+
     return UserSummary.model_validate(row)
 
 
 @user_router.delete("/{id}", response_model=UserDeleteResponse, status_code=200)
-async def delete_user(id: int, repo=Depends(get_user_repo)):
+async def delete_user(id: int, repo=Depends(get_user_repo), session: AsyncSession = Depends(get_session),
+                      request: Request = None):
     du = DeleteUserUseCase(repo)
     try:
         resp = await du.soft_delete(id)
+        await audit(
+            session,
+            request,
+            title="login Successful",
+            entity_type=EntityType.USER,
+            entity_id=user.id,
+            action=ActivityAction.DELETE,
+            outcome=ActivityOutcome.SUCCESS,
+            actor_id=user.id,
+            actor_first_name=user.first_name,
+            meta={"username": user.username},
+        )
+        await session.commit()
         return resp
     except ValueError as ex:
+        await audit(
+            session,
+            request,
+            title="Login failed",
+            entity_type=EntityType.USER,
+            entity_id=0,
+            action=ActivityAction.LOGIN,
+            outcome=ActivityOutcome.FAILED,
+            error_message="Invalid credentials",
+            meta={"id": id},
+        )
+        await session.commit()
         raise HTTPException(status_code=409, detail=str(ex))

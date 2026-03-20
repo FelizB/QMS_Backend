@@ -24,8 +24,16 @@ class ActivityLog(Base):
     entity_id: Mapped[int] = mapped_column(Integer, nullable=False)
 
     action: Mapped[ActivityAction] = mapped_column(
-        SAEnum(ActivityAction, name="activity_action_enum"), nullable=False
+        SAEnum(
+            ActivityAction,
+            name="activity_action_enum",
+            native_enum=False,
+            values_callable=lambda obj: [member.value for member in obj],  # USE VALUES!
+            create_constraint=False
+        ),
+        nullable=False
     )
+
     title: Mapped[str] = mapped_column(String(300), nullable=False)
 
     actor_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
@@ -40,9 +48,16 @@ class ActivityLog(Base):
 
     # Outcome + error context (to log both success and failures)
     outcome: Mapped[ActivityOutcome] = mapped_column(
-        SAEnum(ActivityOutcome, name="activity_outcome_enum"),
+        SAEnum(
+            ActivityOutcome,
+            name="activity_outcome_enum",
+            native_enum=False,
+            values_callable=lambda obj: [member.value for member in obj],
+            create_constraint=False,
+        ),
         nullable=False,
-        server_default="success",  # keep as literal to match migration
+        server_default="success",
+        # keep as literal to match migration
     )
     error_type: Mapped[str | None] = mapped_column(String(200), nullable=True)
     error_message: Mapped[str | None] = mapped_column(String(800), nullable=True)

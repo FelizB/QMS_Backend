@@ -177,7 +177,6 @@ async def get_test_case_breakdown_labeled(
     )
     pv = await svp(session).breakdown_by_priority_with_labels(project_id, include_deleted, release_id, folder_id,
                                                               include_nulls)
-    print("PR:", pv, type(pv))
     ty = await svp(session).breakdown_by_type_with_labels(
         project_id, include_deleted, release_id, folder_id, include_nulls
     )
@@ -189,7 +188,6 @@ async def get_test_case_breakdown_labeled(
         LabeledCount(id=i, label=lbl, count=c, sort_order=so)
         for (i, lbl, c, so) in ty
     ]
-    print("TR:", ty, type(ty))
     return TestCaseBreakdownLabeledOut(
         project_id=project_id,
         include_deleted=include_deleted,

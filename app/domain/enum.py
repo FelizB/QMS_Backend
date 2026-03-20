@@ -42,10 +42,14 @@ class EntityType(str, Enum):
 
 
 class ActivityAction(str, Enum):
-    CREATED = "created"
-    UPDATED = "updated"
-    DELETED = "deleted"
-    EXECUTED = "executed"
+    CREATE = "create"
+    UPDATE = "update"
+    EXECUTE = "execute"
+    DELETE = "delete"
+    LOGIN = "login"
+    LOGOUT = "logout"
+    REFRESH = "refresh"
+    VIEW = "view"
 
 
 class ActivityOutcome(str, Enum):

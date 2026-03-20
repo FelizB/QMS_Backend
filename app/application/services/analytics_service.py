@@ -26,7 +26,7 @@ from typing import Any, Dict, List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.infrastructure.repositories.activity_log_repo_sqlalchemy import ActivityRepository
+from app.infrastructure.repositories.activity_log_repo_sqlalchemy import ActivityLogRepository as ActivityRepository
 from app.infrastructure.repositories.analytics_repository_sqlalchemy import (
     ProjectAnalyticsRepository,
 )
@@ -130,17 +130,17 @@ class AnalyticsService:
         rows, total = await self.activity_repo.get_recent(limit=limit, since=since, org_id=org_id)
         items = [
             RecentFeedItem(
-                title=r.title,
-                actor_first_name=r.actor_first_name,
-                performed_at=r.created_at,
-                entity_type=r.entity_type.value,
-                action=r.action.value,
-                entity_id=r.entity_id,
+                title=r["title"],
+                actor_first_name=r["actor_first_name"],
+                performed_at=r["performed_at"],
+                entity_type=r["entity_type"].value if hasattr(r["entity_type"], "value") else r["entity_type"],
+                action=r["action"].value if hasattr(r["action"], "value") else r["action"],
+                entity_id=r["entity_id"],
             )
             for r in rows
         ]
         return RecentFeedsOut(items=items, total=total)
-    
+
     async def top_projects(
             self,
             limit: int = 4,

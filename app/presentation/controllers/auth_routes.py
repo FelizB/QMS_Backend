@@ -1,13 +1,17 @@
 from datetime import datetime, timezone
 from typing import Optional
-from urllib import request
 from jose import jwt
 from fastapi import APIRouter, Depends, HTTPException, Body, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
+from fastapi import Request
+from sqlalchemy.sql.functions import user
 
+from app.application.services.audit import audit
+from app.application.services.audit_helper import AuditLogger, audit_span
+from app.domain.enum import EntityType, ActivityAction, ActivityOutcome
 from app.application.use_cases.create_user_usecase import CreateUserUseCase
 from app.core.db import get_session
 from app.core.deps import AuthzContext, get_auth_context
@@ -74,6 +78,7 @@ async def register(
         payload: UserCreate,
         session: AsyncSession = Depends(get_session),
         current_user=Depends(get_current_user),
+        request: Request = None,
 ):
     repo = UserRepository(session)
     uc = CreateUserUseCase(repo, allow_public_self_register=True)
@@ -95,7 +100,19 @@ async def register(
         current_is_superuser=current_is_superuser,
         is_authenticated=is_authenticated,
     )
-
+    await audit(
+        session,
+        request,
+        title="registred new user",
+        entity_type=EntityType.USER,
+        entity_id=user.id,
+        action=ActivityAction.CREATE,
+        outcome=ActivityOutcome.SUCCESS,
+        actor_id=user.id,
+        actor_first_name=user.first_name,
+        meta={"username": user.username},
+    )
+    await session.commit()
     return UserOut.model_validate(user, from_attributes=True)
 
 
@@ -103,6 +120,7 @@ async def register(
 async def refresh_token(
         payload: RefreshIn = Body(...),
         session: AsyncSession = Depends(get_session),
+        request: Request = None,
 ):
     # --- Defensive init to avoid UnboundLocalError ---
     data: dict | None = None
@@ -181,6 +199,7 @@ async def refresh_token(
 
     # 5) Re-issue tokens — your create_* functions are keyword-only
     new_access = create_access_token(
+        version=getattr(user, "token_version", 1),
         subject=str(user.id),
         role_id=role.id,
         rv=rv,
@@ -188,12 +207,26 @@ async def refresh_token(
         extra={
             "username": user.username,
             "is_superuser": getattr(user, "superuser", False),
-            "ver": int(getattr(user, "token_version", 1))
+            "ver": int(getattr(user, "token_version", 1)),
+
         },
     )
     new_refresh = create_refresh_token(
         subject=str(user.id),
         sid=sid_value,
+    )
+
+    await audit(
+        session,
+        request,
+        title="loged in successfully",
+        entity_type=EntityType.USER,
+        entity_id=user.id,
+        action=ActivityAction.REFRESH,
+        outcome=ActivityOutcome.SUCCESS,
+        actor_id=user.id,
+        actor_first_name=user.first_name,
+        meta={"username": user.username},
     )
 
     await session.commit()
@@ -208,10 +241,22 @@ async def refresh_token(
 )
 async def logout(
         payload: RefreshIn | None = Body(None),
+        request: Request = None,
         current_user=Depends(get_current_user),
         session: AsyncSession = Depends(get_session),
 ):
     if current_user is None:
+        await audit(
+            session,
+            request,
+            title="Logout failed",
+            entity_type=EntityType.USER,
+            entity_id=0,
+            action=ActivityAction.LOGIN,
+            outcome=ActivityOutcome.FAILED,
+            error_message="Not authenticated",
+            meta={"username": payload.username},
+        )
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
 
     bl_repo = TokenBlacklistRepository(session)
@@ -270,6 +315,19 @@ async def logout(
         msg += " Current access token revoked."
     if not (blacklisted_refresh or blacklisted_access):
         msg += " No token(s) provided to revoke."
+
+    await audit(
+        session,
+        request,
+        title="loged out successfully",
+        entity_type=EntityType.USER,
+        entity_id=user.id,
+        action=ActivityAction.LOGOUT,
+        outcome=ActivityOutcome.SUCCESS,
+        actor_id=user.id,
+        actor_first_name=user.first_name,
+        meta={"username": user.username},
+    )
 
     return LogoutOut(code="LOGOUT_SUCCESS", message=msg, details=None)
 
@@ -363,40 +421,75 @@ async def me(
 async def login(
         form: OAuth2PasswordRequestForm = Depends(),
         session: AsyncSession = Depends(get_session),
+        request: Request = None,
 ):
+    # Early audit on bad creds
     user = await authenticate_user(session, form.username, form.password)
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-
-    if not user.role_id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="A role must be assigned")
+        await audit(
+            session,
+            request,
+            title="Login failed",
+            entity_type=EntityType.USER,
+            entity_id=0,
+            action=ActivityAction.LOGIN,
+            outcome=ActivityOutcome.FAILED,
+            error_message="Invalid credentials",
+            meta={"username": form.username},
+        )
+        await session.commit()
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
     repo = SQLAlchemyUserRepository(session)
     role = await repo.get_role_by_id(user.role_id)
     if not role:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Role not found")
+        await audit(
+            session,
+            request,
+            title="Login failed",
+            entity_type=EntityType.USER,
+            entity_id=0,
+            action=ActivityAction.LOGIN,
+            outcome=ActivityOutcome.FAILED,
+            error_message="Invalid Role ID",
+            meta={"username": form.username},
+        )
+        await session.commit()
+        raise HTTPException(status_code=400, detail="A role must be assigned")
 
     rv = int(getattr(role, "rv", 1))
 
+    # Issue tokens
     access = create_access_token(
-        version=getattr(user, "token_version", 1),
         subject=str(user.id),
         role_id=role.id,
         rv=rv,
-        sid=None,  # let it generate a new session id
+        sid=None,
         extra={
             "username": user.username,
             "is_superuser": getattr(user, "superuser", False),
             "amr": ["pwd"],
+            "ver": int(getattr(user, "token_version", 1)),
         },
     )
+    from jose import jwt as jose_jwt
+    sid_value = jose_jwt.get_unverified_claims(access).get("sid")
+    refresh = create_refresh_token(subject=str(user.id), sid=sid_value)
 
-    # Pair refresh with same SID extracted from access claims
-    sid_value = jwt.get_unverified_claims(access).get("sid")
-
-    refresh = create_refresh_token(
-        subject=str(user.id),
-        sid=sid_value,
+    # Success audit
+    await audit(
+        session,
+        request,
+        title="login Successful",
+        entity_type=EntityType.USER,
+        entity_id=user.id,
+        action=ActivityAction.LOGIN,
+        outcome=ActivityOutcome.SUCCESS,
+        actor_id=user.id,
+        actor_first_name=user.first_name,
+        meta={"username": user.username},
     )
+
+    await session.commit()
 
     return TokenOut(access_token=access, refresh_token=refresh)

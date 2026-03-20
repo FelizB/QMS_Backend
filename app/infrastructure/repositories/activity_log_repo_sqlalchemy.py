@@ -1,15 +1,55 @@
-# app/infrastructure/repositories/activity_log_repo_sqlalchemy.py# app/infrastructure/repositories/activity_log_repo_sqlalchemy.py, Tuple
-from typing import Any
-
 from sqlalchemy import select, and_, desc, func, literal
-from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime
+
+from typing import Optional, Mapping, Any
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.infrastructure.models.activity_log import ActivityLog
+from app.domain.enum import EntityType, ActivityAction, ActivityOutcome
 
 
-class ActivityRepository:
+class ActivityLogRepository:
+    """
+    Thin repo for ActivityLog. No commit/rollback here;
+    caller (route/use-case) owns transaction boundaries.
+    """
+
     def __init__(self, session: AsyncSession):
         self.session = session
+
+    async def add(
+            self,
+            *,
+            org_id: Optional[int],
+            entity_type: EntityType,
+            entity_id: int,
+            action: ActivityAction,
+            title: str,
+            actor_id: Optional[int],
+            actor_first_name: Optional[str],
+            meta: Optional[Mapping[str, Any]],
+            outcome: ActivityOutcome,
+            error_type: Optional[str] = None,
+            error_message: Optional[str] = None,
+            request_id: Optional[str] = None,
+    ) -> ActivityLog:
+        log = ActivityLog(
+            org_id=org_id,
+            entity_type=entity_type,
+            entity_id=entity_id,
+            action=action,
+            title=title,
+            actor_id=actor_id,
+            actor_first_name=actor_first_name,
+            meta=dict(meta) if meta else None,
+            outcome=outcome,
+            error_type=error_type,
+            error_message=error_message,
+            request_id=request_id,
+        )
+        self.session.add(log)
+        # caller may commit; we still flush to get PK if needed
+        await self.session.flush()
+        return log
 
     async def get_recent(
             self,

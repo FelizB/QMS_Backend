@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated, Optional
 from app.core.db import get_session
-from app.infrastructure.repositories.activity_log_repo_sqlalchemy import ActivityRepository
+from app.infrastructure.repositories.activity_log_repo_sqlalchemy import ActivityLogRepository as ActivityRepository
 from app.infrastructure.repositories.analytics_repository_sqlalchemy import \
     ProjectAnalyticsRepository as AnalyticsRepository, ProjectAnalyticsRepository
 from app.application.services.analytics_service import AnalyticsService

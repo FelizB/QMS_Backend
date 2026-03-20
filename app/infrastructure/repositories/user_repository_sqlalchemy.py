@@ -34,7 +34,6 @@ class SQLAlchemyUserRepository(IUserRepository):
     async def get_role_by_id(self, role_id: int) -> Optional[Role]:
         res = await self.session.execute(select(Role).where(Role.id == role_id).limit(1))
         role = res.scalar_one_or_none()
-        print("role:", role.id if role else None, getattr(role, "name", None))
         return role
 
     async def get_role_permissions(self, role_id: int) -> Set[str]:

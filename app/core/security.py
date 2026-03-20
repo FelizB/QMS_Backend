@@ -40,7 +40,7 @@ def _merge_extra(base: Dict[str, Any], extra: Optional[Dict[str, Any]]) -> Dict[
     return base
 
 
-def _base_claims(version: int, subject: str | int, role_id: int, rv: int, sid: Optional[str] = None) -> Dict[
+def _base_claims(subject: str | int, role_id: int, rv: int, sid: Optional[str] = None) -> Dict[
     str, Any]:
     return {
         "type": "access",
@@ -48,7 +48,6 @@ def _base_claims(version: int, subject: str | int, role_id: int, rv: int, sid: O
         "aud": settings.JWT_AUD,
         "sub": subject,  # user id
         "jti": uuid4().hex,
-        "ver": version,
         "sid": sid or str(uuid4()),
         "iat": int(_now().timestamp()),
         "role_id": role_id,
@@ -57,11 +56,11 @@ def _base_claims(version: int, subject: str | int, role_id: int, rv: int, sid: O
     }
 
 
-def create_access_token(*, version: int, subject: str, role_id: int, rv: int, sid: Optional[str] = None,
+def create_access_token(*, subject: str, role_id: int, rv: int, sid: Optional[str] = None,
 
                         extra: Optional[Dict[str, Any]] = None,
                         minutes: int = settings.ACCESS_TOKEN_EXPIRE_MINUTES) -> str:
-    payload = _base_claims(version=version, subject=subject, role_id=role_id, rv=rv, sid=sid)
+    payload = _base_claims(subject=subject, role_id=role_id, rv=rv, sid=sid)
     exp = _now() + timedelta(minutes=minutes)
     payload["exp"] = int(exp.timestamp())
     if extra:

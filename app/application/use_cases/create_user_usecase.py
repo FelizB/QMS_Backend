@@ -1,10 +1,14 @@
 from typing import Optional, Any, Dict, List
+from fastapi import Request
+
 from fastapi import HTTPException
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
 from starlette.status import HTTP_403_FORBIDDEN, HTTP_409_CONFLICT
 
+from app.application.services.audit import audit
 from app.core.security import get_password_hash
+from app.domain.enum import EntityType, ActivityAction, ActivityOutcome
 from app.domain.utils.initials import generate_initials_and_colors
 
 from app.infrastructure.models.user_model import User as UserModel
@@ -118,7 +122,7 @@ class CreateUserUseCase:
     FINAL SINGLE-ROLE VERSION
     """
 
-    def __init__(self, repo: SQLAlchemyUserRepository, allow_public_self_register=True):
+    def __init__(self, repo: SQLAlchemyUserRepository, allow_public_self_register=True, request=Request):
         self.repo = repo
         self.allow_public_self_register = allow_public_self_register
 
@@ -129,7 +133,8 @@ class CreateUserUseCase:
             current_is_admin: bool,
             current_is_superuser: bool,
             is_authenticated: bool,
-            USER_ROLE_ID=5
+            USER_ROLE_ID=5,
+            request: Request = None,
     ) -> UserModel:
 
         session = self.repo.session
@@ -225,5 +230,39 @@ class CreateUserUseCase:
             user = await self.repo.create(user_model)
             return user
 
+
         except IntegrityError as e:
-            raise HTTPException(409, "Unable to create user")
+            await session.rollback()
+
+            # Extract readable message from Postgres
+            orig = str(e.orig)
+
+            # Common Postgres patterns
+            if "uq_users_email" in orig or "users_email_key" in orig:
+                msg = f"Email already exists: {email}"
+
+            elif "uq_users_username" in orig or "users_username_key" in orig:
+                msg = f"Username already exists: {username}"
+
+            elif "uq_users_phone" in orig or "users_phone_key" in orig:
+                msg = f"Phone already exists: {phone}"
+
+            else:
+                # fallback generic
+                msg = "Duplicate record"
+
+            # Audit AFTER rollback
+            await audit(
+                session,
+                request,
+                title="Creation of user failed",
+                entity_type=EntityType.USER,
+                entity_id=0,
+                action=ActivityAction.CREATE,
+                outcome=ActivityOutcome.FAILED,
+                error_message=msg,
+                meta={"username": payload.username},
+            )
+            await session.commit()
+
+            raise HTTPException(status_code=409, detail=msg)
