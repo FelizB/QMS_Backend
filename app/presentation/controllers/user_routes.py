@@ -10,6 +10,8 @@ from app.application.use_cases.delete_user_usecase import DeleteUserUseCase
 from app.core.db import get_session
 from app.domain.enum import EntityType, ActivityAction, ActivityOutcome
 from app.infrastructure.repositories.user_repository_sqlalchemy import SQLAlchemyUserRepository
+from app.presentation.dependencies.auth import get_current_user
+from app.presentation.schemas.auth_schema import UserOut
 from app.presentation.schemas.user_schema import UserSummary, UserUpdate, UserDeleteResponse
 
 user_router = APIRouter(prefix="/users", tags=["users"])
@@ -45,6 +47,14 @@ async def get_user_by_id(id: int, repo=Depends(get_user_repo)):
     if not row:
         raise HTTPException(status_code=404, detail="User not found")
     return UserSummary.model_validate(row)
+
+
+@user_router.get("/by-id-detailed/{id:int}", response_model=UserOut)
+async def get_user_by_id_detailed(id: int, repo=Depends(get_user_repo)):
+    row = await repo.get_by_id(id)
+    if not row:
+        raise HTTPException(status_code=404, detail="User not found")
+    return UserOut.model_validate(row)
 
 
 @user_router.get("/by-email/{email}", response_model=UserSummary)
@@ -89,7 +99,7 @@ async def update_user(id: int, payload: UserUpdate, repo=Depends(get_user_repo),
 
 @user_router.delete("/{id}", response_model=UserDeleteResponse, status_code=200)
 async def delete_user(id: int, repo=Depends(get_user_repo), session: AsyncSession = Depends(get_session),
-                      request: Request = None):
+                      request: Request = None, current_user=Depends(get_current_user), ):
     du = DeleteUserUseCase(repo)
     try:
         resp = await du.soft_delete(id)
@@ -98,12 +108,12 @@ async def delete_user(id: int, repo=Depends(get_user_repo), session: AsyncSessio
             request,
             title="login Successful",
             entity_type=EntityType.USER,
-            entity_id=user.id,
+            entity_id=id,
             action=ActivityAction.DELETE,
             outcome=ActivityOutcome.SUCCESS,
-            actor_id=user.id,
-            actor_first_name=user.first_name,
-            meta={"username": user.username},
+            actor_id=current_user.id,
+            actor_first_name=current_user.first_name,
+            meta={"username": current_user.username},
         )
         await session.commit()
         return resp

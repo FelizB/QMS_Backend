@@ -76,11 +76,12 @@ class UserUpdate(CamelModel):
     active: Optional[bool] = None
     approved: Optional[bool] = None
     locked: Optional[bool] = None
-    role: Optional[str] = None
+    role_id: Optional[int] = None
     first_name: Optional[str] = None
     middle_name: Optional[str] = None
     last_name: Optional[str] = None
     phone: Optional[str] = None
+    gender: Optional[str] = None
     site: Optional[str] = None
     address: Optional[str] = None
     country: Optional[str] = None
