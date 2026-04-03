@@ -19,7 +19,7 @@ class User(Base):
 
     username: Mapped[str] = mapped_column(String(128), unique=True, nullable=False)
     initials: Mapped[str] = mapped_column(String(2), nullable=False)
-    initials_colors = mapped_column(String(128), unique=True, nullable=False)
+    initials_colors = mapped_column(String(128), unique=False, nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
 
@@ -34,7 +34,7 @@ class User(Base):
     middle_name: Mapped[Optional[str]] = mapped_column(String(255))
     last_name: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    gender: Mapped[Optional[str]] = mapped_column(String(16))
+    gender: Mapped[Optional[str]] = mapped_column(String(30), nullable=False)
     birthday: Mapped[Optional[date]] = mapped_column(Date)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=sa.func.now())

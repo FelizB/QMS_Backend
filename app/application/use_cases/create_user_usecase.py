@@ -249,7 +249,7 @@ class CreateUserUseCase:
 
             else:
                 # fallback generic
-                msg = "Duplicate record"
+                msg = f"Duplicate record :{orig}"
 
             # Audit AFTER rollback
             await audit(

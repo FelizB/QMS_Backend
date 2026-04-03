@@ -199,7 +199,6 @@ async def refresh_token(
 
     # 5) Re-issue tokens — your create_* functions are keyword-only
     new_access = create_access_token(
-        version=getattr(user, "token_version", 1),
         subject=str(user.id),
         role_id=role.id,
         rv=rv,
