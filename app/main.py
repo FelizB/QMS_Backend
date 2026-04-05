@@ -29,6 +29,7 @@ from app.presentation.middleware.request_id import RequestIdMiddleware
 from app.presentation.controllers.approvals_routes import approval_router
 from app.presentation.controllers.rolematrix_route import role_router
 from app.presentation.controllers.admin_seed_route import seed_router
+from app.presentation.controllers.audit_logs_route import audit_router
 
 app = FastAPI(title=settings.app_name)
 app.include_router(user_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
@@ -50,6 +51,7 @@ app.include_router(enums_router, prefix=settings.api_prefix, dependencies=[Depen
 app.include_router(approval_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(role_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(seed_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
+app.include_router(audit_router, prefix=settings.api_prefix, dependencies=[Depends(get_current_user)])
 app.include_router(auth_router, prefix=settings.api_prefix)
 app.add_middleware(RequestIdMiddleware)
 install_debug_handlers(app)

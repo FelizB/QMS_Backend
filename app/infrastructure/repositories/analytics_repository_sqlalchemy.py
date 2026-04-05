@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import date, datetime
 from typing import Dict, List, Optional, Literal, Tuple, Type, Any
 
@@ -11,7 +13,7 @@ from app.infrastructure.models.program_model import Program
 from app.infrastructure.models.project_model import Project
 from app.infrastructure.models.testcase_model import TestCase, TestStep
 
-# app/infrastructure/repositories/projects_repo.py
+from datetime import datetime, timedelta, timezone
 from sqlalchemy import select, func, desc, and_, literal, case
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timedelta
@@ -21,6 +23,24 @@ from app.infrastructure.models.activity_log import ActivityLog, EntityType, Acti
 EXECUTED_STATUSES = {"PASSED", "FAILED", "BLOCKED", "SKIPPED"}  # TODO: align to your enums
 
 SECONDS_PER_DAY = 86400.0
+
+
+def _pick_col(model, *names: str):
+    """Return first existing SQLAlchemy column attribute from model by name."""
+    for n in names:
+        if hasattr(model, n):
+            return getattr(model, n)
+    return None
+
+
+def enum_pick(enum_cls, *names: str):
+    for n in names:
+        if hasattr(enum_cls, n):
+            return getattr(enum_cls, n)
+    available = [m.name for m in enum_cls]
+    raise RuntimeError(
+        f"{enum_cls.__name__} missing all of {names}. Available: {available}"
+    )
 
 
 class ProjectAnalyticsRepository:
@@ -637,45 +657,47 @@ class ProjectAnalyticsRepository:
             window_days: int = 7,
             org_id: int | None = None,
     ) -> list[dict[str, Any]]:
-        now = datetime.utcnow()
+
+        now = datetime.now(timezone.utc)
         window_start = now - timedelta(days=window_days)
         prev_start = window_start - timedelta(days=window_days)
         prev_end = window_start
 
         # ---- Resolve Project PK and name columns safely ----
-        # If your model uses 'project_id' instead of 'id', this will adapt.
-        pk_col = getattr(Project, "id", None) or getattr(Project, "project_id")
-        name_col = getattr(Project, "name", None) or getattr(Project, "project_name")
+        pk_col = getattr(Project, "id", None) or getattr(Project, "project_id", None)
+        name_col = getattr(Project, "name", None) or getattr(Project, "project_name", None)
 
         if pk_col is None or name_col is None:
             raise RuntimeError(
-                "Project model must have either (id or project_id) and (name or project_name). "
-                "Please align the repository with your actual column names."
+                "Project model must have either (id or project_id) and (name or project_name)."
             )
 
-        # ---- Filters ----
-        filters = []
-        # Soft-delete field might be 'is_deleted' or similar in your model; align if different.
+        # ---- Project filters ----
+        p_filters = []
         if hasattr(Project, "is_deleted"):
-            filters.append(Project.is_deleted == False)
+            p_filters.append(Project.is_deleted.is_(False))
         if org_id is not None and hasattr(Project, "org_id"):
-            filters.append(Project.org_id == org_id)
+            p_filters.append(Project.org_id == org_id)
 
-        # ---- Base projects subquery: LABEL columns to standard names ----
         projects_q = (
             select(
                 pk_col.label("project_id"),
                 name_col.label("project_name"),
             )
-            .where(and_(*filters)) if filters else select(
+            .where(and_(*p_filters)) if p_filters else
+            select(
                 pk_col.label("project_id"),
                 name_col.label("project_name"),
             )
         ).subquery("p")
 
-        # ---- Test case stats per project ----
-        # If your TestCase model uses a different FK name than 'project_id', align below.
-        tc_filters = [getattr(TestCase, "is_deleted", literal_column("false")) == False]
+        # ---- Test case stats per project (total + executed) ----
+        tc_filters = []
+        if hasattr(TestCase, "is_deleted"):
+            tc_filters.append(TestCase.is_deleted.is_(False))
+        if org_id is not None and hasattr(TestCase, "org_id"):
+            tc_filters.append(TestCase.org_id == org_id)
+
         tc_stats_q = (
             select(
                 TestCase.project_id.label("project_id"),
@@ -687,75 +709,102 @@ class ProjectAnalyticsRepository:
                     )
                 ).label("executed"),
             )
-            .where(and_(*tc_filters))
-            .group_by(TestCase.project_id)
-            .subquery("tc_stats")
-        )
+            .where(and_(*tc_filters)) if tc_filters else
+            select(
+                TestCase.project_id.label("project_id"),
+                func.count().label("total"),
+                func.sum(
+                    case(
+                        (TestCase.test_case_status.in_(list(EXECUTED_STATUSES)), 1),
+                        else_=0,
+                    )
+                ).label("executed"),
+            )
+        ).group_by(TestCase.project_id).subquery("tc_stats")
 
-        # ---- Updates in current window from ActivityLog (entity_type=project) ----
+        # ---- Updates in current window from ActivityLog (entity_type=PROJECT only) ----
+        # Your EntityType enum supports PROJECT; no TESTCASE exists, so we don't use it.
+        upd_filters = [
+            ActivityLog.entity_type == EntityType.PROJECT,
+            ActivityLog.action.in_([ActivityAction.CREATE, ActivityAction.UPDATE]),
+            ActivityLog.created_at >= window_start,
+        ]
+        if org_id is not None and hasattr(ActivityLog, "org_id"):
+            upd_filters.append(ActivityLog.org_id == org_id)
+
         upd_curr_q = (
             select(
                 ActivityLog.entity_id.label("project_id"),
                 func.count().label("updates_in_window"),
             )
-            .where(
-                and_(
-                    ActivityLog.entity_type == EntityType.PROJECT,
-                    ActivityLog.action.in_([ActivityAction.CREATED, ActivityAction.UPDATED]),
-                    ActivityLog.created_at >= window_start,
-                    (ActivityLog.org_id == org_id) if org_id is not None else literal_column("true"),
-                )
-            )
+            .where(and_(*upd_filters))
             .group_by(ActivityLog.entity_id)
             .subquery("upd_curr")
         )
 
-        # ---- Execution increments (CURRENT and PREVIOUS windows)
-        # We map TESTCASE-level execution logs back to PROJECT via TestCase.project_id.
-        # If you do not log 'EXECUTED' events, you can skip these and derive trend differently.
-
-        # CURRENT window
-        exec_curr_q = (
-            select(
-                TestCase.project_id.label("project_id"),
-                func.count().label("exec_incr_curr"),
-            )
-            .select_from(ActivityLog)
-            .join(TestCase, TestCase.id == ActivityLog.entity_id)
-            .where(
-                and_(
-                    ActivityLog.entity_type == EntityType.TESTCASE,
-                    ActivityLog.action == ActivityAction.EXECUTED,
-                    ActivityLog.created_at >= window_start,
-                    (ActivityLog.org_id == org_id) if org_id is not None else literal_column("true"),
-                    getattr(TestCase, "is_deleted", literal_column("false")) == False,
-                )
-            )
-            .group_by(TestCase.project_id)
-            .subquery("exec_curr")
+        # ---- Execution increments derived from TestCase timestamps ----
+        # Prefer real execution timestamp if available.
+        exec_ts_col = _pick_col(
+            TestCase,
+            "executed_at",
+            "last_executed_at",
+            "executed_on",
+            "last_run_at",
+            "updated_at",  # fallback: may be less accurate
         )
 
-        # PREVIOUS window
-        exec_prev_q = (
-            select(
-                TestCase.project_id.label("project_id"),
-                func.count().label("exec_incr_prev"),
-            )
-            .select_from(ActivityLog)
-            .join(TestCase, TestCase.id == ActivityLog.entity_id)
-            .where(
-                and_(
-                    ActivityLog.entity_type == EntityType.TESTCASE,
-                    ActivityLog.action == ActivityAction.EXECUTED,
-                    ActivityLog.created_at >= prev_start,
-                    ActivityLog.created_at < prev_end,
-                    (ActivityLog.org_id == org_id) if org_id is not None else literal_column("true"),
-                    getattr(TestCase, "is_deleted", literal_column("false")) == False,
+        # If no usable timestamp exists, we set increments to 0 and trend becomes flat.
+        if exec_ts_col is not None:
+            exec_base_filters = [TestCase.test_case_status.in_(list(EXECUTED_STATUSES))]
+            if hasattr(TestCase, "is_deleted"):
+                exec_base_filters.append(TestCase.is_deleted.is_(False))
+            if org_id is not None and hasattr(TestCase, "org_id"):
+                exec_base_filters.append(TestCase.org_id == org_id)
+
+            exec_curr_q = (
+                select(
+                    TestCase.project_id.label("project_id"),
+                    func.count().label("exec_incr_curr"),
                 )
+                .where(
+                    and_(
+                        *exec_base_filters,
+                        exec_ts_col >= window_start,
+                    )
+                )
+                .group_by(TestCase.project_id)
+                .subquery("exec_curr")
             )
-            .group_by(TestCase.project_id)
-            .subquery("exec_prev")
-        )
+
+            exec_prev_q = (
+                select(
+                    TestCase.project_id.label("project_id"),
+                    func.count().label("exec_incr_prev"),
+                )
+                .where(
+                    and_(
+                        *exec_base_filters,
+                        exec_ts_col >= prev_start,
+                        exec_ts_col < prev_end,
+                    )
+                )
+                .group_by(TestCase.project_id)
+                .subquery("exec_prev")
+            )
+        else:
+            exec_curr_q = (
+                select(
+                    projects_q.c.project_id.label("project_id"),
+                    literal_column("0").label("exec_incr_curr"),
+                )
+            ).subquery("exec_curr")
+
+            exec_prev_q = (
+                select(
+                    projects_q.c.project_id.label("project_id"),
+                    literal_column("0").label("exec_incr_prev"),
+                )
+            ).subquery("exec_prev")
 
         # ---- Compose final query ----
         join_q = (
@@ -779,7 +828,7 @@ class ProjectAnalyticsRepository:
 
         rows = (await self.session.execute(join_q)).mappings().all()
 
-        # ---- Compute progress + trend in Python ----
+        # ---- Compute progress + trend ----
         result: list[dict[str, Any]] = []
         for r in rows:
             total = int(r["testcases_total"])
@@ -788,12 +837,7 @@ class ProjectAnalyticsRepository:
 
             inc_curr = int(r["exec_incr_curr"])
             inc_prev = int(r["exec_incr_prev"])
-            if inc_curr > inc_prev:
-                trend = "up"
-            elif inc_curr < inc_prev:
-                trend = "down"
-            else:
-                trend = "flat"
+            trend = "up" if inc_curr > inc_prev else "down" if inc_curr < inc_prev else "flat"
 
             result.append({
                 "project_id": int(r["project_id"]),
@@ -804,6 +848,7 @@ class ProjectAnalyticsRepository:
                 "trend": trend,
                 "updates_in_window": int(r["updates_in_window"]),
             })
+
         return result
 
     async def get_recent_creations(

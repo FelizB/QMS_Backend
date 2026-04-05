@@ -34,11 +34,12 @@ class ProjectStatus(str, Enum):
 
 class EntityType(str, Enum):
     USER = "user"
+    ROLE = "role"
     PORTFOLIO = "portfolio"
     PROGRAM = "program"
     PROJECT = "project"
-    TESTCASE = "testcase"
-    TESTSTEP = "teststep"
+    TEST_CASE = "test case"
+    TEST_STEP = "test step"
 
 
 class ActivityAction(str, Enum):
@@ -89,3 +90,16 @@ class ApprovalStatus(StrEnum):
     APPROVED = "approved"
     REJECTED = "rejected"
     CANCELLED = "cancelled"
+
+
+class Department(StrEnum):
+    Quality_Assurance = "Quality Assurance"
+    Governance = "Governance"
+    Information_security = "Information security"
+    Information_Technology = "Information Technology"
+
+
+class Unit(StrEnum):
+    Quality_Testing = "Quality Testing"
+    Infosecurity = "Infosecurity"
+    Technology = "Technology"

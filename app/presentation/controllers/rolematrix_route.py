@@ -3,46 +3,11 @@ from pydantic import BaseModel
 from typing import Optional
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from app.presentation.schemas.role_matrix_schema import RoleOut, ActionOut, ActionIn, GrantOut, GrantIn, RoleIn
 from app.core.db import get_session
 from app.infrastructure.models.role_matrix import Role, RoleAction, RoleActionGrant
 
 role_router = APIRouter(prefix="/roles", tags=["role_matrix"])
-
-
-# ---------- Schemas ----------
-class RoleIn(BaseModel):
-    name: str
-
-
-class RoleOut(BaseModel):
-    id: int
-    name: str
-    is_default: bool
-
-
-class ActionIn(BaseModel):
-    name: str
-
-
-class ActionOut(BaseModel):
-    id: int
-    name: str
-    is_default: bool
-
-
-class GrantIn(BaseModel):
-    role: str  # role name
-    action: str  # action name
-    entity_type: Optional[str] = None
-    allow: bool = True
-
-
-class GrantOut(BaseModel):
-    role: str
-    action: str
-    entity_type: Optional[str] = None
-    allow: bool
 
 
 # ---------- Roles ----------

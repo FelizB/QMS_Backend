@@ -21,6 +21,7 @@ from app.core.security import (
     create_refresh_token,
     decode_refresh_token, decode_access_token,
 )
+from app.domain.security.rbac import require_permission
 from app.infrastructure.models.user_model import User
 from app.infrastructure.repositories.TokenBlacklistRepository import TokenBlacklistRepository
 from app.infrastructure.repositories.user_repository_sqlalchemy import (
@@ -73,50 +74,48 @@ def _build_role_out(role) -> RoleOut:
 # Routes
 # ----------------------------
 
-@auth_router.post("/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+@auth_router.post("/register", response_model=UserOut,
+                  dependencies=[Depends(require_permission("INITIATE", EntityType.USER.value))],
+                  status_code=status.HTTP_201_CREATED)
 async def register(
         payload: UserCreate,
         session: AsyncSession = Depends(get_session),
-        current_user=Depends(get_current_user),
+        current_user=Depends(get_current_user),  # returns user or None
         request: Request = None,
+
 ):
     repo = UserRepository(session)
     uc = CreateUserUseCase(repo, allow_public_self_register=True)
 
-    # Current user flags based on RBAC roles
-    if current_user:
-        flags = derive_role_flags(current_user)
-        current_is_superuser = flags["is_superuser"]
-        current_is_admin = flags["is_admin"]
-        is_authenticated = True
-    else:
-        current_is_superuser = False
-        current_is_admin = False
-        is_authenticated = False
+    is_authenticated = current_user is not None
+    current_user_id = getattr(current_user, "id", None) if is_authenticated else None
 
     user = await uc.execute(
         payload=payload,
-        current_is_admin=current_is_admin,
-        current_is_superuser=current_is_superuser,
         is_authenticated=is_authenticated,
+        current_user_id=current_user_id,
+        request=request,
     )
+
     await audit(
         session,
         request,
-        title="registred new user",
+        title="registered new user",
         entity_type=EntityType.USER,
         entity_id=user.id,
         action=ActivityAction.CREATE,
         outcome=ActivityOutcome.SUCCESS,
-        actor_id=user.id,
-        actor_first_name=user.first_name,
+        actor_id=current_user_id or user.id,
+        actor_first_name=getattr(current_user, "first_name", user.first_name),
         meta={"username": user.username},
     )
+
     await session.commit()
     return UserOut.model_validate(user, from_attributes=True)
 
 
-@auth_router.post("/refresh", response_model=TokenOut)
+@auth_router.post("/refresh", dependencies=[Depends(require_permission("VIEW", EntityType.USER.value))],
+                  response_model=TokenOut)
 async def refresh_token(
         payload: RefreshIn = Body(...),
         session: AsyncSession = Depends(get_session),
@@ -331,7 +330,8 @@ async def logout(
     return LogoutOut(code="LOGOUT_SUCCESS", message=msg, details=None)
 
 
-@auth_router.get("/me", response_model=UserOut)
+@auth_router.get("/me", dependencies=[Depends(require_permission("VIEW", EntityType.USER.value))],
+                 response_model=UserOut)
 async def me(
         ctx: AuthzContext = Depends(get_auth_context),
         session: AsyncSession = Depends(get_session),

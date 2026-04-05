@@ -1,8 +1,18 @@
+from __future__ import annotations
+
 from sqlalchemy import select, and_, desc, func, literal
 from datetime import datetime
 
 from typing import Optional, Mapping, Any
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.infrastructure.models.activity_log import ActivityLog
+from app.domain.enum import EntityType, ActivityAction, ActivityOutcome
+# app/infrastructure/repositories/activity_log_repository.py
+
+from typing import Optional
+from sqlalchemy import select, func, and_, desc, or_
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.infrastructure.models.activity_log import ActivityLog
 from app.domain.enum import EntityType, ActivityAction, ActivityOutcome
 
@@ -97,3 +107,69 @@ class ActivityLogRepository:
         items = [dict(r) for r in rows]
 
         return items, total
+
+    async def list_logs(
+            self,
+            org_id: int | None,
+            q: str | None = None,
+            entity_type: EntityType | None = None,
+            action: ActivityAction | None = None,
+            outcome: ActivityOutcome | None = None,
+            actor_id: int | None = None,
+            from_dt=None,
+            to_dt=None,
+            page: int = 1,
+            page_size: int = 20,
+    ):
+        filters = []
+        if org_id is not None:
+            filters.append(ActivityLog.org_id == org_id)
+
+        if entity_type is not None:
+            filters.append(ActivityLog.entity_type == entity_type)
+        if action is not None:
+            filters.append(ActivityLog.action == action)
+        if outcome is not None:
+            filters.append(ActivityLog.outcome == outcome)
+        if actor_id is not None:
+            filters.append(ActivityLog.actor_id == actor_id)
+
+        if from_dt is not None:
+            filters.append(ActivityLog.created_at >= from_dt)
+        if to_dt is not None:
+            filters.append(ActivityLog.created_at <= to_dt)
+
+        if q:
+            # Search on title + actor_first_name + request_id
+            like = f"%{q.strip()}%"
+            filters.append(
+                or_(
+                    ActivityLog.title.ilike(like),
+                    ActivityLog.actor_first_name.ilike(like),
+                    ActivityLog.request_id.ilike(like),
+                )
+            )
+
+        base = select(ActivityLog).where(and_(*filters)) if filters else select(ActivityLog)
+
+        # total
+        total_q = select(func.count()).select_from(base.subquery())
+        total = (await self.session.execute(total_q)).scalar_one()
+
+        # page
+        offset = (page - 1) * page_size
+        items_q = (
+            base.order_by(desc(ActivityLog.created_at))
+            .offset(offset)
+            .limit(page_size)
+        )
+
+        rows = (await self.session.execute(items_q)).scalars().all()
+        return rows, total
+
+    async def get_by_id(self, log_id: int, org_id: int | None = None):
+        q = select(ActivityLog).where(ActivityLog.id == log_id)
+        if org_id is not None:
+            q = q.where(ActivityLog.org_id == org_id)
+        row = (await self.session.execute(q)).scalar_one_or_none()
+        return row

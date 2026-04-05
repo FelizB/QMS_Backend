@@ -6,8 +6,9 @@ from app.infrastructure.models.base import Base  # your Declarative Base
 class Role(Base):
     __tablename__ = "roles"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    name: Mapped[str] = mapped_column(String(64), unique=True, index=True)  # SUPERADMIN, ADMIN, MANAGER, USER
-    is_default: Mapped[bool] = mapped_column(Boolean, default=False)  # protect from deletion
+    name: Mapped[str] = mapped_column(String(64), unique=True, index=True)  # SUPERADMIN, ADMIN, USER...
+    is_default: Mapped[bool] = mapped_column(Boolean, default=False)  # default for self-register
+    is_system: Mapped[bool] = mapped_column(Boolean, default=False)  # cannot be edited/deleted
 
 
 class RoleAction(Base):

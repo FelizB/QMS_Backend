@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
-from app.domain.enum import ProjectStatus, TaskType, TaskPriority, TaskStatus
+from app.domain.enum import ProjectStatus, TaskType, TaskPriority, TaskStatus, Department, Unit, Role, ActivityAction, \
+    ActivityOutcome
 from app.presentation.schemas.enums_schema import EnumListOut
 
 ENUM_REGISTRY = {
@@ -7,6 +8,11 @@ ENUM_REGISTRY = {
     "task-status": TaskStatus,
     "task-priority": TaskPriority,
     "task-tyoe": TaskType,
+    "department": Department,
+    "unit": Unit,
+    "role": Role,
+    "action": ActivityAction,
+    "outcome": ActivityOutcome,
 }
 
 enums_router = APIRouter(prefix="/api/v1/enums", tags=["enums"])
@@ -28,3 +34,11 @@ async def list_enum(enum_name: str):
             for e in enum_cls
         ]
     }
+
+
+@enums_router.get("/role", response_model=EnumListOut)
+async def get_enum_role(role_name: str):
+    enum_cls = ENUM_REGISTRY.get(role_name)
+    if not enum_cls:
+        raise HTTPException(status_code=404, detail="Enum not found")
+    return {}
