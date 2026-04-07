@@ -34,7 +34,7 @@ class Portfolio(Base):
     # Soft delete fields
     is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default=sa.sql.false())
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
-
+    template_id: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
     custom_properties: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB, nullable=True,
                                                                         server_default=sa.text("'{}'::jsonb"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())

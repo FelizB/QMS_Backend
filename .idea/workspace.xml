@@ -4,22 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="added user detailed API">
-      <change afterPath="$PROJECT_DIR$/app/domain/security/rbac.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/controllers/audit_logs_route.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/activity_log_schema.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/presentation/schemas/role_matrix_schema.py" afterDir="false" />
+    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="ammedned the routes and audit routes">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/application/use_cases/create_user_usecase.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/domain/enum.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/domain/enum.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/role_matrix.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/role_matrix.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/activity_log_repo_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/activity_log_repo_sqlalchemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/infrastructure/repositories/analytics_repository_sqlalchemy.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/repositories/analytics_repository_sqlalchemy.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/auth_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/auth_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/enum_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/enum_routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/rolematrix_route.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/rolematrix_route.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/presentation/controllers/user_routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/controllers/user_routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/core/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/core/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/infrastructure/models/portfolio_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/infrastructure/models/portfolio_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/presentation/schemas/portfolio_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/presentation/schemas/portfolio_schema.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -324,7 +313,15 @@
       <option name="project" value="LOCAL" />
       <updated>1775249268603</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="ammedned the routes and audit routes">
+      <option name="closed" value="true" />
+      <created>1775417461735</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1775417461735</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -360,7 +357,8 @@
     <MESSAGE value="added some dashboard apis" />
     <MESSAGE value="Updated some APIs" />
     <MESSAGE value="added user detailed API" />
-    <option name="LAST_COMMIT_MESSAGE" value="added user detailed API" />
+    <MESSAGE value="ammedned the routes and audit routes" />
+    <option name="LAST_COMMIT_MESSAGE" value="ammedned the routes and audit routes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

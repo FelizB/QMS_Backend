@@ -15,6 +15,7 @@ class PortfolioBase(CamelModel):
     artifact_type_id: Optional[int] = None
     is_active: bool = True
     is_default: bool = False
+    template_id: Optional[str] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     last_updated_date: datetime = Field(default_factory=datetime.utcnow)
     custom_properties: Optional[Dict[str, Any]] = {}
@@ -30,6 +31,7 @@ class PortfolioUpdate(CamelModel):
     website: Optional[str] = None
     workspace_type_id: Optional[int] = None
     artifact_type_id: Optional[int] = None
+    template_id: Optional[str] = None
     is_active: Optional[bool] = None
     is_default: Optional[bool] = None
     last_updated_date: Optional[datetime] = None
@@ -43,11 +45,11 @@ class PortfolioOut(CamelModel):
 
     id: int
     name: str
+    is_default: bool
     is_active: bool
-    is_deleted: bool
     guid: UUID
+    template_id: Optional[str]
     concurrency_guid: UUID
-    last_updated_date: datetime
     created_at: datetime
 
 
