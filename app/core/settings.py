@@ -30,9 +30,9 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_ISS: str = "https://qms.example.com"
     JWT_AUD: str = "https://api.qms.example.com"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-    JWT_LEEWAY_SECONDS: int = 5
+    JWT_LEEWAY_SECONDS: int = 60
 
     REFRESH_COOKIE_NAME: str = "refresh_token"
     REFRESH_COOKIE_SECURE: bool = True
