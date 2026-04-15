@@ -10,7 +10,8 @@ from app.application.use_cases.program.list_programs_by_portfolio import ListPro
 from app.application.use_cases.program.update_program import UpdateProgramUseCase
 from app.core.db import get_session
 from app.infrastructure.repositories.program_repository_sqlalchemy import ProgramRepository
-from app.presentation.schemas.program_schema import ProgramCreate, ProgramUpdate, ProgramOut, ProgramDeleteResponse
+from app.presentation.schemas.program_schema import ProgramCreate, ProgramUpdate, ProgramOut, ProgramDeleteResponse, \
+    ProgramPagedResult
 
 program_router = APIRouter(tags=["Programs"])
 
@@ -47,11 +48,22 @@ async def list_programs(portfolio_id: int, skip: int = 0, limit: int = Query(50,
     return await list_uc.execute(portfolio_id, skip=skip, limit=limit, q=q)
 
 
-@program_router.get("/programs", response_model=list[ProgramOut])
-async def list_all_programs(skip: int = 0, limit: int = Query(50, le=200), q: str | None = None,
-                            deps=Depends(get_usecases)):
+@program_router.get("/programs", response_model=ProgramPagedResult)
+async def list_all_programs(
+        skip: int = 0,
+        limit: int = Query(50, le=200),
+        q: str | None = None,
+        deps=Depends(get_usecases),
+):
     _, _, list_uc, *_ = deps
-    return await list_uc.execute(skip=skip, limit=limit, q=q)
+    items = await list_uc.execute(skip=skip, limit=limit, q=q)
+
+    return ProgramPagedResult(
+        items=items,
+        total=len(items),
+        page=(skip // limit) + 1,
+        page_size=limit,
+    )
 
 
 @program_router.get("/programs/{program_id}", response_model=ProgramOut)

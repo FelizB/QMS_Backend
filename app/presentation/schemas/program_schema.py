@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional, Any, Dict
+from typing import Optional, Any, Dict, List
 from uuid import UUID
 
 from pydantic import Field
@@ -45,6 +45,13 @@ class ProgramOut(ProgramBase):
     concurrency_guid: UUID
     created_at: datetime
     last_updated_date: datetime
+
+
+class ProgramPagedResult(CamelModel):
+    total: int
+    items: List[ProgramOut]
+    page: int
+    page_size: int
 
 
 class ProgramDeleteSummaryOut(CamelModel):
