@@ -22,14 +22,20 @@ if config.config_file_name:
 # ─────────────────────────────────────────────────────────────────────────────
 # Pick a SYNC DB URL for Alembic
 db_url = (
-        os.getenv("MIGRATIONS_DB_URL")
-        or os.getenv("DATABASE_URL_SYNC")
-        or os.getenv("DB_URL")
-        or os.getenv("DATABASE_URL")
+    os.getenv("MIGRATIONS_DB_URL")
+    or os.getenv("DATABASE_URL_SYNC")
+    or os.getenv("QMS_DB_URL")
+    or os.getenv("DB_URL")
+    or os.getenv("DATABASE_URL")
 )
 
 # Convert async URL to sync before setting into config
-if db_url and db_url.startswith("postgresql+asyncpg://"):
+if not db_url:
+    raise RuntimeError(
+        "No database URL found. Set one of: MIGRATIONS_DB_URL, DATABASE_URL_SYNC, QMS_DB_URL, DB_URL, DATABASE_URL"
+    )
+
+if db_url.startswith("postgresql+asyncpg://"):
     db_url = db_url.replace("+asyncpg", "")
 
 if db_url:
