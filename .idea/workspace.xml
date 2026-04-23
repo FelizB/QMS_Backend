@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="git pull">
+    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="added some req">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
     </list>
@@ -367,7 +367,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776965875741</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="added some req">
+      <option name="closed" value="true" />
+      <created>1776968455976</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1776968455976</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -407,7 +415,8 @@
     <MESSAGE value="changed config for auth" />
     <MESSAGE value="updated the programs route" />
     <MESSAGE value="git pull" />
-    <option name="LAST_COMMIT_MESSAGE" value="git pull" />
+    <MESSAGE value="added some req" />
+    <option name="LAST_COMMIT_MESSAGE" value="added some req" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
