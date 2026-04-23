@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="updated the programs route" />
+    <list default="true" id="76951219-9da3-4ab8-b160-1119095a3cc1" name="Changes" comment="git pull">
+      <change afterPath="$PROJECT_DIR$/scripts/bootstrap_db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -340,7 +343,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776289059288</updated>
     </task>
-    <option name="localTasksCounter" value="29" />
+    <task id="LOCAL-00029" summary="git pull">
+      <option name="closed" value="true" />
+      <created>1776963720584</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1776963720584</updated>
+    </task>
+    <option name="localTasksCounter" value="30" />
     <servers />
   </component>
   <component name="UnknownFeatures">
@@ -379,7 +390,8 @@
     <MESSAGE value="ammedned the routes and audit routes" />
     <MESSAGE value="changed config for auth" />
     <MESSAGE value="updated the programs route" />
-    <option name="LAST_COMMIT_MESSAGE" value="updated the programs route" />
+    <MESSAGE value="git pull" />
+    <option name="LAST_COMMIT_MESSAGE" value="git pull" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
